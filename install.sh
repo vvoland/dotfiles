@@ -1,5 +1,8 @@
 #!/bin/sh
 
+git submodule init
+git submodule update --remote --recursive
+
 stow polybar
 stow dunst
 
