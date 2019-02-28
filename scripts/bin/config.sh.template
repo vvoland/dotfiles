@@ -1,0 +1,22 @@
+#!/bin/bash
+# General
+export REMOTE_HOST=woland.xyz
+export GEO_LOCATION="LAT:LONG"
+
+export MEDIA_DIR=media
+
+# Backup
+export BACKUP_GPG_KEY=""
+export BACKUP_GPG_PASSWORD=""
+export BACKUP_AZURE_ACCOUNT_NAME=""
+export BACKUP_AZURE_ACCOUNT_KEY=""
+
+# Screenshots
+export SCREENSHOTS_LOCAL_DIR="$HOME/screenshots"
+export SCREENSHOTS_USER=""
+export SCREENSHOTS_PASSWORD=""
+export SCREENSHOTS_BACKEND=gnome
+export SCREENSHOTS_EDITOR=kolourpaint
+######
+
+
