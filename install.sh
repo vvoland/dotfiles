@@ -1,5 +1,12 @@
 #!/bin/sh
 
+if [ ! -f "scripts/bin/config.sh" ] then
+    echo "No scripts/bin/config.sh!"
+    echo "Please copy config.sh.template file in scripts/bin"
+    echo "And save it as config.sh"
+    exit 1
+fi
+
 XDG_CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.cache}
 
 git submodule init
