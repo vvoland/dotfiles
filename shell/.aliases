@@ -1,0 +1,7 @@
+alias calc="bc -l"
+alias copy="xclip -selection clipboard"
+alias vim=nvim
+alias o=xdg-open
+alias fork="i3-sensible-terminal"
+alias scommit="git commit -S --verbose"
+alias commit="git commit --verbose"

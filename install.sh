@@ -6,6 +6,7 @@ git submodule init
 git submodule update --remote --recursive
 
 stow scripts
+stow shell
 
 stow polybar
 stow dunst
