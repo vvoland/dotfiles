@@ -1,0 +1,239 @@
+set $theme_color #00897b
+set $theme_color_inactive #00897b66
+set $window_unfocused_color #222222
+set $urgent_color #7d353e
+
+
+client.focused          $theme_color $theme_color #ffffff $theme_color_inactive
+client.focused_inactive $window_unfocused_color $window_unfocused_color #AAAAAA #292d2e
+client.unfocused        $window_unfocused_color $window_unfocused_color #888888 #292d2e
+client.urgent           #2f343a $urgent_color #ffffff $urgent_color
+
+font pango:Hack 9.5
+
+new_window normal 0 px
+gaps outer 10
+gaps inner 10
+smart_gaps on
+smart_borders on
+
+for_window [class="^.*"] border pixel 2
+for_window [class="Firefox"] border pixel 0
+for_window [class="Code"] border pixel 0
+for_window [floating] border pixel 0
+
+set $up k
+set $down j
+set $left h
+set $right l
+
+# use Mouse+Mod1 to drag floating windows to their wanted position
+floating_modifier Mod1
+
+# start a terminal
+bindsym Mod1+Return exec i3-sensible-terminal
+
+# kill focused window
+bindsym Mod1+Shift+q kill
+
+# launcher
+bindsym Mod1+d exec --no-startup-id rofi -show run
+bindsym Mod4+d exec --no-startup-id rofi -show window
+bindsym Mod4+f exec --no-startup-id interactive-locate
+
+# change focus
+bindsym Mod1+$left focus left
+bindsym Mod1+$down focus down
+bindsym Mod1+$up focus up
+bindsym Mod1+$right focus right
+
+# alternatively, you can use the cursor keys:
+bindsym Mod1+Left focus left
+bindsym Mod1+Down focus down
+bindsym Mod1+Up focus up
+bindsym Mod1+Right focus right
+
+# move focused window
+bindsym Mod1+Shift+$left move left
+bindsym Mod1+Shift+$down move down
+bindsym Mod1+Shift+$up move up
+bindsym Mod1+Shift+$right move right
+
+# alternatively, you can use the cursor keys:
+bindsym Mod1+Shift+Left move left
+bindsym Mod1+Shift+Down move down
+bindsym Mod1+Shift+Up move up
+bindsym Mod1+Shift+Right move right
+
+# split in horizontal orientation
+bindsym Mod1+b split h
+
+# split in vertical orientation
+bindsym Mod1+v split v
+
+# enter fullscreen mode for the focused container
+bindsym Mod1+f fullscreen toggle
+
+# change container layout (stacked, tabbed, toggle split)
+bindsym Mod1+s layout stacking
+bindsym Mod1+t layout tabbed
+bindsym Mod1+e layout toggle split
+
+# toggle tiling / floating
+bindsym Mod1+Shift+space floating toggle
+
+# change focus between tiling / floating windows
+bindsym Mod1+space focus mode_toggle
+
+# focus the parent container
+bindsym Mod1+a focus parent
+
+# focus the child container
+#bindsym Mod1+d focus child
+
+# move the currently focused window to the scratchpad
+bindsym Mod1+Shift+minus move scratchpad
+
+# Show the next scratchpad window or hide the focused scratchpad window.
+# If there are multiple scratchpad windows, this command cycles through them.
+bindsym Mod1+minus scratchpad show
+
+# switch to workspace
+bindsym Mod1+1 workspace 1
+bindsym Mod1+2 workspace 2
+bindsym Mod1+3 workspace 3
+bindsym Mod1+4 workspace 4
+bindsym Mod1+5 workspace 5
+bindsym Mod1+6 workspace 6
+bindsym Mod1+7 workspace 7
+bindsym Mod1+8 workspace 8
+bindsym Mod1+9 workspace 9
+bindsym Mod1+0 workspace 0
+
+bindsym Mod4+1 workspace 1x
+bindsym Mod4+2 workspace 2x
+bindsym Mod4+3 workspace 3x
+bindsym Mod4+4 workspace 4x
+bindsym Mod4+5 workspace 5x
+bindsym Mod4+6 workspace 6x
+bindsym Mod4+7 workspace 7x
+bindsym Mod4+8 workspace 8x
+bindsym Mod4+9 workspace 9x
+bindsym Mod4+0 workspace 10x
+
+# move focused container to workspace
+bindsym Mod1+Shift+1 move container to workspace 1
+bindsym Mod1+Shift+2 move container to workspace 2
+bindsym Mod1+Shift+3 move container to workspace 3
+bindsym Mod1+Shift+4 move container to workspace 4
+bindsym Mod1+Shift+5 move container to workspace 5
+bindsym Mod1+Shift+6 move container to workspace 6
+bindsym Mod1+Shift+7 move container to workspace 7
+bindsym Mod1+Shift+8 move container to workspace 8
+bindsym Mod1+Shift+9 move container to workspace 9
+bindsym Mod1+Shift+0 move container to workspace 0
+
+bindsym Mod4+Shift+1 move container to workspace 1x
+bindsym Mod4+Shift+2 move container to workspace 2x
+bindsym Mod4+Shift+3 move container to workspace 3x
+bindsym Mod4+Shift+4 move container to workspace 4x
+bindsym Mod4+Shift+5 move container to workspace 5x
+bindsym Mod4+Shift+6 move container to workspace 6x
+bindsym Mod4+Shift+7 move container to workspace 7x
+bindsym Mod4+Shift+8 move container to workspace 8x
+bindsym Mod4+Shift+9 move container to workspace 9x
+bindsym Mod4+Shift+0 move container to workspace 10x
+
+# custom workspaces
+bindsym Mod1+u workspace unity
+bindsym Mod1+Shift+u move container to workspace unity
+
+bindsym Mod1+o workspace vm
+
+# window assignments
+assign [class="Unity"]unity
+assign [class="VirtualBox"]vm
+assign [class="Wire"]8
+assign [class="Signal"]8
+assign [class="rider"]0
+
+# floating windows
+for_window [class="Steam"] floating enable
+for_window [class="wine"] floating enable
+for_window [class="Pidgin"] floating enable
+for_window [class="kolourpaint"] floating enable
+
+# reload the configuration file
+bindsym Mod1+Shift+c reload
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym Mod1+Shift+r restart
+# exit i3 (logs you out of your X session)
+bindsym Mod1+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+
+# resize window (you can also use the mouse for that)
+bindsym Mod1+r mode "resize"
+mode "resize" {
+        # These bindings trigger as soon as you enter the resize mode
+        bindsym $left       resize shrink width 10 px or 10 ppt
+        bindsym $down       resize grow height 10 px or 10 ppt
+        bindsym $up         resize shrink height 10 px or 10 ppt
+        bindsym $right      resize grow width 10 px or 10 ppt
+
+        # same bindings, but for the arrow keys
+        bindsym Left        resize shrink width 10 px or 10 ppt
+        bindsym Down        resize grow height 10 px or 10 ppt
+        bindsym Up          resize shrink height 10 px or 10 ppt
+        bindsym Right       resize grow width 10 px or 10 ppt
+
+        # back to normal: Enter or Escape
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+
+bindsym button9 floating toggle
+bindsym button8 floating toggle
+
+bindsym Mod1+p exec --no-startup-id i3lock -c 000000
+bindsym Mod1+Mod4+p exec shutdown now
+
+bindsym XF86AudioRaiseVolume exec --no-startup-id volume up
+bindsym XF86AudioLowerVolume exec --no-startup-id volume down
+bindsym XF86AudioMute exec --no-startup-id volume toggle_mute
+
+bindsym XF86MonBrightnessUp exec xbacklight -inc 5
+bindsym XF86MonBrightnessDown exec xbacklight -dec 5
+
+bindsym Mod1+m mode "music"
+mode "music"
+{
+    bindsym space exec playerctl play-pause
+    bindsym l exec playerctl next
+    bindsym h exec playerctl previous
+    bindsym k exec --no-startup-id volume up
+    bindsym j exec --no-startup-id volume down
+
+    bindsym Escape mode "default"
+}
+
+bindsym Mod1+n mode "move"
+mode "move"
+{
+    bindsym c move position center
+    bindsym h move left 100px
+    bindsym j move down 100px
+    bindsym k move up 100px
+    bindsym l move right 100px
+    bindsym Escape mode "default"
+}
+
+bindsym --release Mod4+s exec screenshot noupload
+bindsym --release Mod4+Shift+s exec screenshot
+bindsym --release Mod4+Shift+e exec screenshot edit
+bindsym --release Mod4+w exec xdotool click --repeat 50 --delay 10 1
+bindsym --release Mod4+c exec cat /ext/vm/shared/exchange.txt | xclip -selection clipboard
+bindsym --release Mod4+v exec xclip -selection clipboard -o > /ext/vm/shared/exchange.txt
+bindsym --release Mod4+r exec record-mp4
+bindsym --release Mod4+g exec choose-and-upload
+
+exec --no-startup-id startup
+exec_always --no-startup-id set-wallpaper

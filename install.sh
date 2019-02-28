@@ -8,6 +8,7 @@ git submodule update --remote --recursive
 stow scripts
 stow shell
 
+stow i3
 stow polybar
 stow dunst
 stow rofi
