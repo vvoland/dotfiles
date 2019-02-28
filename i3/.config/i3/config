@@ -1,4 +1,4 @@
-set $theme_color #00897b
+set $theme_color #066158
 set $theme_color_inactive #00897b66
 set $window_unfocused_color #222222
 set $urgent_color #7d353e
