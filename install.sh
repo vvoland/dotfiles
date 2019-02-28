@@ -7,6 +7,7 @@ git submodule update --remote --recursive
 
 stow polybar
 stow dunst
+stow rofi
 
 # Neovim with dein
 mkdir -p "${XDG_CACHE_HOME}/dein/"
