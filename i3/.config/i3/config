@@ -236,4 +236,5 @@ bindsym --release Mod4+r exec record-mp4
 bindsym --release Mod4+g exec choose-and-upload
 
 exec --no-startup-id startup
+exec_always --no-startup-id bar-refresh
 exec_always --no-startup-id set-wallpaper
