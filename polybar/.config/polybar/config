@@ -16,7 +16,7 @@ trans = #00000000
 white = #FFFFFF
 black = #000000
 
-background = #1F1F1F
+background = #551F1F1F
 background-alt = #3F3F3F
 foreground = #FFFFFF
 foreground-alt = #A9ABB0
@@ -43,7 +43,8 @@ brown = #6d4c41
 grey = #757575
 blue-gray = #546e7a
 
-acolor = ${color.orange}
+acolor = ${color.teal}
+
 curgent = ${color.red}
 coccupied = ${color.light-blue}
 
