@@ -68,3 +68,5 @@ set shiftwidth=4
 set softtabstop=4
 set clipboard+=unnamedplus
 set autowrite
+set relativenumber
+set rnu
