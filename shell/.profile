@@ -7,3 +7,4 @@ export DOTNET_CLI_TELEMETRY_OPTOUT=1
 export TERMINAL="gnome-terminal"
 export VISUAL=nvim
 export EDITOR="$VISUAL"
+export QT_STYLE_OVERRIDE=gtk2
