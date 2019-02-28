@@ -1,0 +1,17 @@
+#!/bin/bash
+USAGE="post-screenshot <filename> [noupload]"
+[ -z "$1" ] && echo $USAGE && exit 1
+[ ! -f "$1" ] && echo "File $1 does not exist" && exit 2
+
+if [ "$2" == "edit" ]
+then
+    [ -z "$SCREENSHOTS_EDITOR" ] && echo "\$SCREENSHOTS_EDITOR is not set!" && exit 3
+    "$SCREENSHOTS_EDITOR" "$1"
+fi
+
+if [ "$2" == "noupload" ]
+then
+    xclip -selection clipboard -t image/png -i "$1"
+else
+    upload-media "$1"
+fi

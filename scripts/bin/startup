@@ -1,0 +1,11 @@
+#!/bin/sh
+
+source config.sh
+
+monitors.py
+dunst &
+"$HOME/.config/polybar/launch.sh" & disown
+nm-applet & disown
+compton -b
+redshift -l $GEO_LOCATION -t 6500:3200 & disown
+syncthing -no-browser & disown

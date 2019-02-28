@@ -1,0 +1,30 @@
+#!/bin/bash
+
+USAGE="upload-media <filename>"
+[ ! $# -ge 1 ] && echo $USAGE && echo "No file provided!" && exit 1
+
+FILE=$1
+[ ! -f "$FILE" ] && echo $USAGE && echo "File does not exist!" && exit 2
+
+source config.sh
+FILENAME=$(basename $FILE)
+TARGET_URL="https://$REMOTE_HOST/$MEDIA_DIR/$FILENAME"
+
+echo $TARGET_URL | xclip -selection clipboard -i
+
+
+SSHPASS=$SCREENSHOTS_PASSWORD sshpass -e sftp $SCREENSHOTS_USER@$REMOTE_HOST <<END_SCRIPT
+cd $MEDIA_DIR
+put $FILE $FILENAME
+chmod 644 $FILENAME
+bye
+END_SCRIPT
+
+STATUS=$?
+if [ $STATUS != "0" ]
+then
+    echo "FTP failed!"
+    echo 3
+fi
+echo "Uploaded $FILENAME!"
+exit 0

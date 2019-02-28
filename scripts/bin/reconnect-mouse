@@ -1,0 +1,7 @@
+#!/bin/sh
+MAC="F0:1D:BC:E7:21:21"
+bluetoothctl remove "${MAC}"
+timeout 5 bluetoothctl scan on
+bluetoothctl pair "${MAC}"
+bluetoothctl connect "${MAC}"
+bluetoothctl trust "${MAC}"

@@ -5,6 +5,8 @@ XDG_CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.cache}
 git submodule init
 git submodule update --remote --recursive
 
+stow scripts
+
 stow polybar
 stow dunst
 stow rofi
