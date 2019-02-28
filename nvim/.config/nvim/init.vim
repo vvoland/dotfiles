@@ -31,7 +31,7 @@ if dein#load_state('~/.cache/dein')
   call dein#add('markonm/traces.vim')
   call dein#add('tpope/vim-pathogen')
   call dein#add('editorconfig/editorconfig-vim')
-  " call dein#add('fsharp/vim-fsharp')
+  call dein#add('fsharp/vim-fsharp', { 'on_ft': 'fsharp', 'build': 'make fsautocomplete'})
 
 
   " You can specify revision/branch/tag.
