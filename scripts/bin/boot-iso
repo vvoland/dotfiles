@@ -16,5 +16,6 @@ fi
 qemu-system-x86_64 -enable-kvm \
     -m $RAM \
     -net nic,model=virtio \
+    -net user \
     -cdrom "$1"\
     -boot d
