@@ -1,0 +1,20 @@
+#!/bin/bash
+RAM=1024
+
+[ -z "$1" ] && echo "usage: vm-from-iso <iso> [ram]" && exit 1
+if [ ! -z "$2" ]
+then
+    if [[ "$2" =~ ^[0123456789]+$ ]]
+    then
+        RAM="$2"
+    else
+        echo "Invalid RAM amount $2"
+        exit 2
+    fi
+fi
+
+qemu-system-x86_64 -enable-kvm \
+    -m $RAM \
+    -net nic,model=virtio \
+    -cdrom "$1"\
+    -boot d
