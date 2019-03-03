@@ -21,7 +21,6 @@ if dein#load_state('~/.cache/dein')
   " Add or remove your plugins here:
   call dein#add('Shougo/neosnippet.vim')
   call dein#add('Shougo/neosnippet-snippets')
-  call dein#add('OmniSharp/omnisharp-vim')
   call dein#add('vim-syntastic/syntastic')
   call dein#add('Shougo/deoplete.nvim')
   call dein#add('roxma/nvim-yarp')
