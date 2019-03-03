@@ -9,7 +9,7 @@ client.focused_inactive $window_unfocused_color $window_unfocused_color #AAAAAA 
 client.unfocused        $window_unfocused_color $window_unfocused_color #888888 #292d2e
 client.urgent           #2f343a $urgent_color #ffffff $urgent_color
 
-font pango:Hack 9.5
+font pango:Ubuntu 0
 
 new_window normal 0 px
 gaps outer 10
