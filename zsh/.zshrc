@@ -13,7 +13,6 @@ BULLETTRAIN_PROMPT_ORDER=(
     perl
     ruby
     virtualenv
-    go
     git
     hg
     cmd_exec_time
