@@ -19,6 +19,7 @@ stow i3
 stow polybar
 stow dunst
 stow rofi
+stow compton
 
 # Neovim with dein
 mkdir -p "${XDG_CACHE_HOME}/dein/"
