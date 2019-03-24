@@ -242,18 +242,20 @@ date =  %Y-%m-%d
 [module/battery]
 type = internal/battery
 
-full-at = 99
+full-at = 100
 
 battery = BAT1
 adapter = ACAD
 poll-interval = 5
 
-format-discharging-prefix = "🔋 "
 format-charging-underline = ${color.yellow}
 format-discharging-underline = ${color.orange} 
+format-full-underline = ${color.underline} 
+
 
 format-charging = "<animation-charging> <label-charging>"
 format-discharging = <ramp-capacity> <label-discharging>
+format-full = " 100%"
 
 ramp-capacity-0 = 
 ramp-capacity-1 = 
