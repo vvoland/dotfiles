@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+DEVICE="intel_backlight"
+STEPS=16
+
+DIR="/sys/class/backlight/${DEVICE}/"
+
+[ -z "$1" ] && echo "usage: platform-brightness <up/down>" && exit 1
+[ ! -d "$DIR" ] && echo "Directory $DIR does not exist" && exit 2
+
+max=$(cat $DIR/max_brightness)
+current=$(cat $DIR/brightness)
+step=$(($max/$STEPS))
+
+case "$1" in
+    "up")
+        current=$(($current + $step))
+        ;;
+    "down")
+        current=$(($current - $step))
+        ;;
+    *)
+        echo "Invalid option $1"
+        exit 3
+        ;;
+esac
+
+if [ $current -lt 5 ]
+then
+    current=5
+fi
+
+if [ $current -gt $max ]
+then
+    current=$max
+fi
+
+echo $current > $DIR/brightness

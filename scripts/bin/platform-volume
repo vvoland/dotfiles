@@ -5,7 +5,7 @@ set -e
 STEP=5
 AMIXER="amixer"
 
-[ -z "$1" ] && echo "usage: volume [up/down/toggle_mute]" && exit 1
+[ -z "$1" ] && echo "usage: platfom-volume [up/down/toggle_mute]" && exit 1
 
 case "$1" in
     "up")

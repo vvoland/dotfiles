@@ -195,15 +195,16 @@ mode "resize" {
 bindsym button9 floating toggle
 bindsym button8 floating toggle
 
-bindsym Mod1+p exec --no-startup-id i3lock -c 000000
+bindsym Mod1+p exec --no-startup-id platform-lock
+bindsym Mod1+Shift+p exec --no-startup-id platform-suspend
 bindsym Mod1+Mod4+p exec shutdown now
 
-bindsym XF86AudioRaiseVolume exec --no-startup-id volume up
-bindsym XF86AudioLowerVolume exec --no-startup-id volume down
-bindsym XF86AudioMute exec --no-startup-id volume toggle_mute
+bindsym XF86AudioRaiseVolume exec --no-startup-id platform-volume up
+bindsym XF86AudioLowerVolume exec --no-startup-id platform-volume down
+bindsym XF86AudioMute exec --no-startup-id platform-volume toggle_mute
 
-bindsym XF86MonBrightnessUp exec xbacklight -inc 5
-bindsym XF86MonBrightnessDown exec xbacklight -dec 5
+bindsym XF86MonBrightnessUp exec --no-startup-id platform-brightness up
+bindsym XF86MonBrightnessDown exec --no-startup-id platform-brightness down
 
 bindsym Mod1+m mode "music"
 mode "music"
@@ -237,6 +238,6 @@ bindsym --release Mod4+v exec xclip -selection clipboard -o > /ext/vm/shared/exc
 bindsym --release Mod4+r exec record-mp4
 bindsym --release Mod4+g exec choose-and-upload
 
-exec --no-startup-id startup
+exec --no-startup-id platform-startup
 exec_always --no-startup-id bar-refresh
 exec_always --no-startup-id set-wallpaper
