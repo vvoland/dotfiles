@@ -212,8 +212,8 @@ mode "music"
     bindsym space exec playerctl play-pause
     bindsym l exec playerctl next
     bindsym h exec playerctl previous
-    bindsym k exec --no-startup-id volume up
-    bindsym j exec --no-startup-id volume down
+    bindsym k exec --no-startup-id platform-volume up
+    bindsym j exec --no-startup-id platform-volume down
 
     bindsym Escape mode "default"
 }
