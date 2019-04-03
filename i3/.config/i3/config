@@ -12,7 +12,7 @@ client.urgent           #2f343a $urgent_color #ffffff $urgent_color
 font pango:Ubuntu 0
 
 new_window normal 0 px
-gaps outer 10
+gaps outer 0
 gaps inner 10
 smart_gaps on
 smart_borders on
