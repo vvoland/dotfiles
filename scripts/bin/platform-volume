@@ -2,18 +2,19 @@
 
 set -e
 
-STEP=5
+STEP=1
 AMIXER="amixer"
+DEVICE="PCM"
 
 [ -z "$1" ] && echo "usage: platfom-volume [up/down/toggle_mute]" && exit 1
 
 case "$1" in
     "up")
-    "$AMIXER" set Master "${STEP}%+"
+    "$AMIXER" set "$DEVICE" "${STEP}%+"
     ;;
     "down")
-    "$AMIXER" set Master "${STEP}%-"
+    "$AMIXER" set "$DEVICE" "${STEP}%-"
     ;;
     "toggle_mute")
-    "$AMIXER" set Master toggle
+    "$AMIXER" set "$DEVICE" toggle
 esac
