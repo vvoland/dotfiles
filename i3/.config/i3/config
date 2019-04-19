@@ -163,6 +163,7 @@ for_window [class="wine"] floating enable
 for_window [class="Pidgin"] floating enable
 for_window [class="kolourpaint"] floating enable
 for_window [title="Hold on..."] floating enable
+for_window [title="Hold on"] floating enable
 for_window [title="Unity Package Manager"] floating enable
 for_window [title="Starting Unity..."] floating enable
 
