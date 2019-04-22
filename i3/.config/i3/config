@@ -13,7 +13,7 @@ font pango:Ubuntu 0
 
 new_window normal 0 px
 gaps outer 0
-gaps inner 10
+gaps inner 0
 smart_gaps on
 smart_borders on
 
