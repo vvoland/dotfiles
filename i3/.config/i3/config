@@ -1,5 +1,5 @@
-set $theme_color #066158
-set $theme_color_inactive #00897b66
+set $theme_color #1e88e5
+set $theme_color_inactive #1e88e566
 set $window_unfocused_color #222222
 set $urgent_color #7d353e
 
