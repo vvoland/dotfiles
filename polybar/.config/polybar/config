@@ -73,9 +73,10 @@ border-color = ${color.bar-background}
 module-margin-left = 1
 module-margin-right = 1
 
-font-0 = "Ubuntu Mono:pixelsize=12;2"
-font-1 = "Material Icons:size=13;4"
-font-2 = "FontAwesome:pixelsize=12;2"
+font-0 = "Source Code Pro:size=10;4"
+font-1 = "Material Icons:size=10;4"
+font-2 = "FontAwesome:size=10;4"
+font-3 = "Material Design Icons:size=10;4"
 
 cursor-click = pointer
 cursor-scroll = ns-resize
@@ -108,9 +109,10 @@ border-color = ${color.bar-background}
 module-margin-left = 1
 module-margin-right = 1
 
-font-0 = "Ubuntu Mono:pixelsize=12;2"
-font-1 = "Material Icons:size=13;4"
-font-2 = "FontAwesome:pixelsize=12;2"
+font-0 = "Source Code Pro:size=10;4"
+font-1 = "Material Icons:size=10;4"
+font-2 = "FontAwesome:size=10;4"
+font-3 = "Material Design Icons:size=10;4"
 
 cursor-click = pointer
 cursor-scroll = ns-resize
