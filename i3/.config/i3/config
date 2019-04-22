@@ -1,5 +1,5 @@
-set $theme_color #066158
-set $theme_color_inactive #00897b66
+set $theme_color #1e88e5
+set $theme_color_inactive #1e88e566
 set $window_unfocused_color #222222
 set $urgent_color #7d353e
 
@@ -13,11 +13,11 @@ font pango:Ubuntu 0
 
 new_window normal 0 px
 gaps outer 0
-gaps inner 10
+gaps inner 0
 smart_gaps on
 smart_borders on
 
-for_window [class="^.*"] border pixel 2
+for_window [class="^.*"] border pixel 1
 for_window [class="Firefox"] border pixel 0
 for_window [class="Code"] border pixel 0
 for_window [floating] border pixel 0
@@ -163,6 +163,7 @@ for_window [class="wine"] floating enable
 for_window [class="Pidgin"] floating enable
 for_window [class="kolourpaint"] floating enable
 for_window [title="Hold on..."] floating enable
+for_window [title="Hold on"] floating enable
 for_window [title="Unity Package Manager"] floating enable
 for_window [title="Starting Unity..."] floating enable
 
@@ -178,8 +179,8 @@ bindsym Mod1+r mode "resize"
 mode "resize" {
         # These bindings trigger as soon as you enter the resize mode
         bindsym $left       resize shrink width 10 px or 10 ppt
-        bindsym $down       resize grow height 10 px or 10 ppt
-        bindsym $up         resize shrink height 10 px or 10 ppt
+        bindsym $down       resize shrink height 10 px or 10 ppt
+        bindsym $up         resize grow height 10 px or 10 ppt
         bindsym $right      resize grow width 10 px or 10 ppt
 
         # same bindings, but for the arrow keys

@@ -5,8 +5,8 @@
  */
 
 * {
-   maincolor:        #00897b;
-   highlight:        bold #00897b;
+   maincolor:        #4E7DB8;
+   highlight:        bold #4E7DB8;
    urgentcolor:      #d81b60;
 
    fgwhite:          #cfcfcf;
