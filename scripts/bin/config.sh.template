@@ -17,6 +17,12 @@ export SCREENSHOTS_USER=""
 export SCREENSHOTS_PASSWORD=""
 export SCREENSHOTS_BACKEND=gnome
 export SCREENSHOTS_EDITOR=kolourpaint
+
+# Notifications
+MATRIX_NOTIFICATION_SERVER="https://matrix.woland.xyz"
+MATRIX_NOTIFICATION_ROOM="%21tesgyafh837gr87gufhis:woland.xyz"
+MATRIX_NOTIFICATION_TOKEN=""
+
 ######
 
 
