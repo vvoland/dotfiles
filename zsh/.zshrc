@@ -28,6 +28,7 @@ export BULLETTRAIN_DIR_BG=023 # Dark teal
 export BULLETTRAIN_DIR_BG=126 # Pink
 export BULLETTRAIN_DIR_BG=240 # Grey
 export BULLETTRAIN_DIR_BG=066 # Teal
+export BULLETTRAIN_DIR_BG=004
 
 
 export BULLETTRAIN_TIME_FG=default

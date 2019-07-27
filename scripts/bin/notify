@@ -1,0 +1,19 @@
+#!/bin/bash
+source ~/bin/config.sh
+
+if [[ $# -ge 1 ]]
+then
+    MESSAGE=$@
+else
+    MESSAGE=$(cat /dev/stdin)
+fi
+
+result=$(curl -XPOST -d "{\"msgtype\":\"m.text\", \"body\":\"${MESSAGE}\"}" "${MATRIX_NOTIFICATION_SERVER}:8448/_matrix/client/r0/rooms/${MATRIX_NOTIFICATION_ROOM}/send/m.room.message?access_token=${MATRIX_NOTIFICATION_TOKEN}" -q 2>/dev/null)
+
+echo "$result" | grep error > /dev/null
+if [[ $? -eq 0 ]]
+then
+    echo "Error sending notification!"
+    echo $result
+    exit 1
+fi
