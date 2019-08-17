@@ -5,3 +5,6 @@ alias o=xdg-open
 alias fork="i3-sensible-terminal"
 alias scommit="git commit -S --verbose"
 alias commit="git commit --verbose"
+
+alias min="awk 'NR==1{a = \$1 + 0; next} {if (\$1 < a) a = \$1;} END {print a}'"
+alias max="awk 'NR==1{a = \$1 + 0; next} {if (\$1 > a) a = \$1;} END {print a}'"
