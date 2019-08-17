@@ -8,3 +8,8 @@ alias commit="git commit --verbose"
 
 alias min="awk 'NR==1{a = \$1 + 0; next} {if (\$1 < a) a = \$1;} END {print a}'"
 alias max="awk 'NR==1{a = \$1 + 0; next} {if (\$1 > a) a = \$1;} END {print a}'"
+
+function bindiff()
+{
+    cmp -l $1 $2 | gawk '{printf "%08X %02X %02X\n", $1, strtonum(0$2), strtonum(0$3)}'
+}
