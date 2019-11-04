@@ -1,0 +1,5 @@
+#!/bin/sh
+
+[ -z "$1" ] && echo "usage: random-hex <bytes-num>" && exit 1
+
+head -c "$1" /dev/random | od -t x1 -An | tr -d ' '
