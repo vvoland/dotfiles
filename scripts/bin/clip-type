@@ -1,3 +1,4 @@
 #!/bin/sh
 sleep 1
+xdotool click 1
 xclip -o | xdotool type --delay 50 -f -

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+export KBUILD_BUILD_TIMESTAMP=''
+export KCFLAGS="-O2"
+export KPPCFLAGS="-O2"
+export KCFLAGS="$KCFLAGS -march=native"
+export KPPCFLAGS="$KPPCFLAGS -march=native"
+#export CC="ccache gcc"
+#export CXX="ccache g++"
+make -j12 LOCALVERSION=-woland-$1 bindeb-pkg

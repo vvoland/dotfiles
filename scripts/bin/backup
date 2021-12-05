@@ -1,12 +1,19 @@
 #!/bin/bash
 
-source config.sh
+name=$(date +'%Y-%m-%d')
 
-PASSPHRASE="${BACKUP_GPG_PASSWORD}" AZURE_ACCOUNT_NAME="${BACKUP_AZURE_ACCOUNT_NAME}" AZURE_ACCOUNT_KEY="${BACKUP_AZURE_ACCOUNT_KEY}" duplicity \
-    --full-if-older-than 1M \
-    --encrypt-key "${BACKUP_GPG_KEY}" \
-    --include "/ext/docs" \
-    --include "/ext/camera" \
-    --exclude "**" \
-    / \
-    "azure://${BACKUP_AZURE_ACCOUNT_NAME}"
+echo -n "Creating archive $name? [y/N]: "
+read confirm
+
+if [[ ! "$confirm" == "y" ]]; then
+    echo "Cancelled!"
+    exit 1
+fi
+
+borg --progress create -c 900 \
+    "ssh://woland@woland.xyz:6666/~/backup::$name" \
+    /data/docs \
+    /data/photos \
+    /data/archive \
+    /data/code \
+    --stat

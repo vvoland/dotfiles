@@ -1,0 +1,11 @@
+#!/bin/bash
+echo -n "Confirm yes... "
+read confirm
+
+if [ "$confirm" == "yes" ]; then
+    make clean
+    git clean -fx
+    rm -r debian
+
+    cp /boot/config-`uname -r` .config && (yes '' |make oldconfig)
+fi

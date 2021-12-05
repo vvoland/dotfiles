@@ -3,17 +3,17 @@
 set -e
 
 STEP=5
-AMIXER="amixer"
+AMIXER="amixer -c 1"
 
 [ -z "$1" ] && echo "usage: platfom-volume [up/down/toggle_mute]" && exit 1
 
 case "$1" in
     "up")
-    "$AMIXER" set Master "${STEP}%+"
+    $AMIXER set Master "${STEP}%+"
     ;;
     "down")
-    "$AMIXER" set Master "${STEP}%-"
+    $AMIXER set Master "${STEP}%-"
     ;;
     "toggle_mute")
-    "$AMIXER" set Master toggle
+    $AMIXER set Master toggle
 esac

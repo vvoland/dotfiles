@@ -30,3 +30,5 @@ stow neovim
 git clone https://github.com/robbyrussell/oh-my-zsh "${XDG_CACHE_HOME}/oh-my-zsh/"
 install zsh/bullet-train.zsh-theme "${XDG_CACHE_HOME}/oh-my-zsh/themes/"
 stow zsh --ignore="*.zsh-theme"
+
+git clone https://github.com/zsh-users/zsh-autosuggestions ${XDG_CACHE_HOME}/oh-my-zsh/plugins/zsh-autosuggestions

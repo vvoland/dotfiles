@@ -3,6 +3,9 @@ set $theme_color_inactive #1e88e566
 set $window_unfocused_color #222222
 set $urgent_color #7d353e
 
+set $theme_color #d81b60
+set $theme_color_inactive #1ed81b60
+
 
 client.focused          $theme_color $theme_color #ffffff $theme_color_inactive
 client.focused_inactive $window_unfocused_color $window_unfocused_color #AAAAAA #292d2e

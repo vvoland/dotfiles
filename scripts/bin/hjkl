@@ -1,0 +1,11 @@
+#!/bin/sh
+
+xmodmap -e "keycode 66 = Mode_switch"
+xmodmap -e "keysym h = h H Left H"
+xmodmap -e "keysym j = j J Down J"
+xmodmap -e "keysym k = k K Up K"
+xmodmap -e "keysym l = l L Right L lstroke Lstroke lstroke"
+
+xmodmap -e "keysym f = f F Return F ae AE ae AE f F ae AE f F ae AE"
+xmodmap -e "keysym g = g G BackSpace G eng ENG eng ENG g G eng ENG g G eng ENG"
+xmodmap -e "keysym q =  q Q Escape Q Greek_pi Greek_OMEGA Greek_pi Greek_OMEGA q Q Greek_pi Greek_OMEGA q Q Greek_pi Greek_OMEGA"

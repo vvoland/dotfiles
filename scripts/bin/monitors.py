@@ -129,6 +129,7 @@ def main():
     laptop = None
     hdmi = None
     vga = None
+    dp = None
     
     for out in connected:
         if 'LVDS' in out.id:
@@ -137,6 +138,9 @@ def main():
             hdmi = out
         if 'VGA' in out.id:
             vga = out
+        if 'DisplayPort' in out.id:
+            dp = out
+            dp.best_mode = "FullHD"
 
     for out in outputs:
         if not out.connected:
@@ -145,6 +149,10 @@ def main():
     if len(connected) == 1:
         output_on(outputs[0], True)
     else:
+        if hdmi and dp:
+            dp.best_mode = "FullHD"
+            output_on(dp, True)
+            output_on(hdmi, False, ['--right-of', dp.id])
         if hdmi and vga:
             if laptop:
                 output_off(laptop)

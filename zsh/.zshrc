@@ -10,11 +10,7 @@ BULLETTRAIN_PROMPT_ORDER=(
     custom
 #    context
     dir
-    perl
-    ruby
-    virtualenv
     git
-    hg
     cmd_exec_time
   )
 export BULLETTRAIN_PROMPT_SEPARATE_LINE=false
@@ -24,14 +20,22 @@ export BULLETTRAIN_CONTEXT_BG=059
 export BULLETTRAIN_TIME_BG=172
 export BULLETTRAIN_TIME_BG=234
 export BULLETTRAIN_DIR_BG=067
-export BULLETTRAIN_DIR_BG=023 # Dark teal 
 export BULLETTRAIN_DIR_BG=126 # Pink
 export BULLETTRAIN_DIR_BG=240 # Grey
 export BULLETTRAIN_DIR_BG=066 # Teal
 export BULLETTRAIN_DIR_BG=004
+export BULLETTRAIN_DIR_BG=023 # Dark teal 
 
-
+export BULLETTRAIN_GIT_BG=007
 export BULLETTRAIN_TIME_FG=default
+export BULLETTRAIN_DIR_FG=default
+
+# Light theme
+#export BULLETTRAIN_TIME_FG=00
+#export BULLETTRAIN_DIR_FG=00
+#export BULLETTRAIN_STATUS_FG=00
+
+
 
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
@@ -80,7 +84,7 @@ ZSH_THEME="bullet-train"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(git zsh-autosuggestions)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -116,3 +120,9 @@ source ~/.aliases
 source ~/.profile
 
 autoload zmv
+bindkey '^ ' autosuggest-accept
+export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=2"
+export ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+export ZSH_AUTOSUGGEST_USE_ASYNC=true
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

@@ -6,6 +6,17 @@ monitors.py
 dunst &
 "$HOME/.config/polybar/launch.sh" & disown
 nm-applet & disown
-compton -b
-redshift -l $GEO_LOCATION -t 6500:3200 & disown
+compton & disown
+redshift -l 51.2225:18.573889 -t 6500:3200 &
 syncthing -no-browser & disown
+#conky -c ~/.config/conky/mpris-album-art/conky.conf --daemonize
+platform-keyring
+xsettingsd & disown
+hjkl
+
+set -e
+dev_id=$(xinput list | grep 'KATAR Mouse' | head -n 1 | sed -E 's/.*id=([0-9]+).*/\1/g')
+speed_prop=$(xinput list-props $dev_id | grep 'Accel Speed (' | sed -E 's/.*Accel Speed \(([0-9]+)\).*/\1/g')
+xinput set-prop $dev_id $speed_prop 1
+
+xrandr --output DisplayPort-0 --newmode FullHD 148.50  1920 2008 2052 2200  1080 1084 1089 1125  +HSync +Vsync && xrandr --addmode DisplayPort-0 FullHD && xrandr --output DisplayPort-0 FullHD

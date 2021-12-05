@@ -1,46 +1,66 @@
 set nocompatible
 
-call plug#begin('~/.cache/vim-plugged')
-    Plug 'roxma/nvim-yarp'
-    Plug 'roxma/vim-hug-neovim-rpc'
-    Plug 'stephpy/vim-yaml'
-    Plug 'markonm/traces.vim'
-    Plug 'editorconfig/editorconfig-vim'
-    Plug 'rust-lang/rust.vim'
-    Plug 'peterhoeg/vim-qml'
+" Required:
+set runtimepath+=~/.cache/dein/repos/github.com/Shougo/dein.vim
 
-    Plug 'autozimu/LanguageClient-neovim', { 'do': 'bash install.sh'}
+" Required:
+if dein#load_state('~/.cache/dein')
+  call dein#begin('~/.cache/dein')
 
-    Plug 'Shougo/echodoc.vim'
+  " Let dein manage dein
+  " Required:
+  call dein#add('~/.cache/dein/repos/github.com/Shougo/dein.vim')
 
-    Plug 'dylanaraps/wal.vim'
-    Plug 'NLKNguyen/papercolor-theme'
-    Plug 'rakr/vim-one'
+  " Add or remove your plugins here:
+  call dein#add('Shougo/neosnippet.vim')
+  call dein#add('Shougo/neosnippet-snippets')
+  "call dein#add('vim-syntastic/syntastic')
+  call dein#add('roxma/nvim-yarp')
+  call dein#add('roxma/vim-hug-neovim-rpc')
+  call dein#add('stephpy/vim-yaml')
+  call dein#add('markonm/traces.vim')
+  call dein#add('editorconfig/editorconfig-vim')
+  call dein#add('rust-lang/rust.vim')
+  call dein#add('peterhoeg/vim-qml')
 
-    Plug 'junegunn/fzf', { 'dir': '~/.cache/fzf', 'do': './install --all' }
-    Plug 'junegunn/fzf.vim'
+  call dein#add('autozimu/LanguageClient-neovim', { 'build': 'bash install.sh'})
 
-    Plug 'OmniSharp/omnisharp-vim'
-    Plug 'ncm2/ncm2'
-    Plug 'ncm2/ncm2-path'
-    Plug 'ncm2/ncm2-cssomni'
-    Plug 'ncm2/ncm2-jedi'
-    Plug 'leafgarland/typescript-vim'
-    Plug 'CaffeineViking/vim-glsl'
-call plug#end()
+  call dein#add('Shougo/echodoc.vim')
 
-"source /usr/share/doc/fzf/examples/fzf.vim
+  call dein#add('dylanaraps/wal.vim')
+  call dein#add('NLKNguyen/papercolor-theme')
+  call dein#add('rakr/vim-one')
+
+  call dein#add('junegunn/fzf')
+  call dein#add('junegunn/fzf.vim')
+
+  "call dein#add('Shougo/deoplete.nvim')
+  "call dein#add('zchee/deoplete-jedi')
+  call dein#add('OmniSharp/omnisharp-vim')
+  call dein#add('ncm2/ncm2')
+  call dein#add('ncm2/ncm2-path')
+  call dein#add('ncm2/ncm2-cssomni')
+  call dein#add('ncm2/ncm2-jedi')
+
+
+  " You can specify revision/branch/tag.
+  call dein#add('Shougo/deol.nvim', { 'rev': 'a1b5108fd' })
+
+  " Required:
+  call dein#end()
+  call dein#save_state()
+endif
+
+source /usr/share/doc/fzf/examples/fzf.vim
 nnoremap <expr> <C-p> (len(system('git rev-parse')) ? ':Files' : ':GFiles --recurse-submodules --exclude-standard --cached')."\<cr>"
 nnoremap <C-b> :call fzf#vim#buffers()<cr>
 
-command! -bang -nargs=* Rg call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
+"command! -bang -nargs=* Rg call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
 
 let g:LanguageClient_serverCommands = {
 \ 'rust': ['rust-analyzer'],
 \ 'cpp': ['ccls', '--log-file=/tmp/cq.log'],
 \ 'c': ['ccls', '--log-file=/tmp/cq.log'],
-\ 'typescript': ['typescript-language-server', '--stdio'],
-\ 'python': ['pyls'],
 \ }
 
 set completefunc=LanguageClient#complete
@@ -87,7 +107,7 @@ augroup OmniSharp
   " any other messages in this space including e.g. ALE linting messages.
   autocmd CursorHold *.cs OmniSharpTypeLookup
 
-  autocmd FileType cs command! -bang -nargs=* Rg call fzf#vim#grep("rg -g '*.cs' --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
+  "autocmd FileType cs command! -bang -nargs=* Rg call fzf#vim#grep("rg -g '*.cs' --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
   autocmd FileType cs let $FZF_DEFAULT_COMMAND = 'find . -type f -iname "*.cs"'
 
   " The following commands are contextual, based on the cursor position.
@@ -132,7 +152,7 @@ let g:deoplete#enable_at_startup = 1
 "End dein Scripts-------------------------
 "
 "colorscheme wal
-set background=dark
+set background=light
 let g:PaperColor_Theme_Options = {
   \   'theme': {
   \     'default': {
@@ -162,9 +182,5 @@ set softtabstop=4
 set clipboard+=unnamedplus
 set autowrite
 set relativenumber
-set nu rnu
+set rnu
 set path+=**
-
-set modeline
-set modelines=5
-

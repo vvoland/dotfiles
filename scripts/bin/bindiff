@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+usage="usage: bindiff <file1> <fil2>"
+
+[ -z "$1" ] && echo "$usage" && exit 1
+[ -z "$2" ] && echo "$usage" && exit 1
+
+cmp -l "$1" "$2" | gawk '{printf "%08X %02X %02X\n", $1, strtonum(0$2), strtonum(0$3)}'

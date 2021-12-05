@@ -2,21 +2,22 @@
  * Based on flat-orange by
  * User: mbfraga
  * Copyright: Martin B. Fraga
+ * highlight:        bold #d81b60;
  */
 
 * {
-   maincolor:        #4E7DB8;
-   highlight:        bold #4E7DB8;
+   maincolor:        #111111;
+   highlight:        bold italic #000000;
    urgentcolor:      #d81b60;
 
-   fgwhite:          #cfcfcf;
-   blackdarkest:     #1d1d1d;
-   blackwidget:      #262626;
-   blackentry:       #292929;
-   blackselect:      #303030;
-   darkgray:         #848484;
+   fgwhite:          #111111;
+   blackdarkest:     #ffffff;
+   blackwidget:      #eeeeee;
+   blackentry:       #eeeeee;
+   blackselect:      #dddddd;
+   darkgray:         #aaaaaa;
    scrollbarcolor:   #505050;
-   font: "Ubuntu Mono 14";
+   font: "Lato 14";
 
    text-color:       @fgwhite;
    background-color: @blackdarkest;
