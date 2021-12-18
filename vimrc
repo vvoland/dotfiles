@@ -55,6 +55,9 @@ augroup LSP
 	nnoremap <leader>lm :call LanguageClient_contextMenu()<CR>
 augroup END
 
+nnoremap <expr> <C-p> (len(system('git rev-parse')) ? ':Files' : ':GFiles --recurse-submodules --exclude-standard --cached')."\<CR>"
+nnoremap <C-b> :call fzf#vim#buffers()<CR>
+
 
 colorscheme wal
 set notermguicolors
