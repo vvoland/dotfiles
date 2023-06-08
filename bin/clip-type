@@ -1,2 +1,4 @@
 #!/bin/sh
+sleep 1
+ydotool click -D 25 0xC0
 wl-paste | ydotool type -f -
