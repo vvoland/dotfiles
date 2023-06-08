@@ -7,6 +7,7 @@ vim.cmd([[
     set hidden
     set noshowmode
     set nu
+    set mouse=
     set softtabstop=4
     set completeopt=menu,menuone,noselect
 
