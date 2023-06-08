@@ -16,6 +16,7 @@ vim.cmd([[
     Plug 'dylanaraps/wal.vim'
 
     Plug 'fatih/go.vim'
+    Plug 'rust-lang/rust.vim'
     Plug 'Shougo/echodoc.vim'
     Plug 'neovim/nvim-lspconfig'
     Plug 'hrsh7th/cmp-nvim-lsp'
@@ -94,6 +95,17 @@ nvim_lsp.gopls.setup{
     },
     on_attach = on_attach,
 }
+nvim_lsp.rust_analyzer.setup{
+    capabilities = capabilities,
+    settings = {
+        rust_analyzer = {
+        },
+
+    },
+    on_attach = on_attach,
+}
+
+
 function goimports(timeoutms)
     local context = { source = { organizeImports = true } }
     vim.validate { context = { context, "t", true } }
