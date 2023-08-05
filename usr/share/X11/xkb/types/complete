@@ -1,0 +1,22 @@
+default xkb_types "complete" {
+    include "basic"
+    include "mousekeys"
+    include "pc"
+    include "iso9995"
+    include "level5"
+    include "extra"
+    include "numpad"
+    type "CUSTOM_HJKL" {
+       modifiers= Mod5+Shift+Lock; 
+       map[Shift] = Level2;            //maps shift and no Lock. Shift+Alt goes here, too, because Alt isn't in modifiers.
+       map[Lock] = Level3;
+       map[Shift+Lock] = Level3;       //maps shift and Lock. Shift+Lock+Alt goes here, too.
+       map[Mod5] = Level4;
+       map[Mod5+Shift] = Level5;
+       level_name[Level1]= "Base";
+       level_name[Level2]= "Shift";
+       level_name[Level3]= "Lock";
+       level_name[Level4]= "Alt";
+       level_name[Level5]= "AltShift";
+   };
+};
