@@ -34,3 +34,10 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.c
 
 # vimrc
 ln -s $(pwd)/vimrc ~/.vimrc
+
+mkdir -p ~/.config/nvim
+ln -s $(pwd)/neovim/init.lua ~/.config/nvim/init.lua
+
+curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim \
+    --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
