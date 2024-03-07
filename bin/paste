@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    pbpaste
+elif [ "$XDG_SESSION_TYPE" == "wayland" ]; then
+    wl-paste
+else
+    xclip -selection clipboard -o
+fi
