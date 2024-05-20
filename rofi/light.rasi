@@ -1,0 +1,12 @@
+* {
+    bg0:    #ffffffF2;
+    bg1:    #eeeeee;
+    bg2:    #3D3D3D80;
+    bg3:    #5CB6F9;
+    fg0:    #333333;
+    fg1:    #333333;
+    fg2:    #444444;
+    fg3:    #000;
+}
+
+@import "base.rasi"
