@@ -1,0 +1,151 @@
+{
+    "layer": "top",
+    "position": "top", // Waybar position (top|bottom|left|right)
+    "height": 40,
+    "spacing": 0,
+    // "output": "DP-1", // Uncomment to specify a display
+    // "width": 1850, // Uncomment to set a custom width
+
+// Configuration - modules-left
+
+    "modules-left": [
+        "custom/launcher",
+        "sway/workspaces",
+        "sway/mode",
+    ],    
+    "custom/launcher": {
+    	"format":"󰀻 ",
+    	"on-click": "exec rofi -show",
+    	"tooltip": false,
+    },
+    "sway/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": true,
+        "format": "{icon}",
+        "format-icons": {
+		"3": "3",
+		"4": "4",
+		"5": "5",
+		"6": "6",
+		"7": "7",
+		"8": "8",
+		"9": "9",
+		"10": "10",
+        }
+    },
+    "sway/mode": {
+        "format": "<span style=\"italic\">{}</span>"
+    },
+    "sway/window": {
+        //"all-outputs": true, // Uncomment for active window on all outputs
+        "format": "{}"
+    },
+
+// Configuration - modules-right
+
+    "modules-right": [
+        "tray",
+        "network",
+        //"idle_inhibitor",
+        "cpu",
+        "temperature",
+        "memory",
+        "backlight",
+        "pulseaudio",
+        "battery",
+        "clock",
+    ],
+        //"custom/power"
+
+    "network": {
+        "format": " Disabled",
+        "format-wifi": "{essid} ({signalStrength}%)",
+        "tooltip-format-wifi": "{bandwidthDownBits:>} {bandwidthUpBits:>} ",
+        "format-ethernet": "{bandwidthDownBits:>}{bandwidthUpBits:>}",
+        "tooltip-format-ethernet": "{ifname}: {ipaddr}/{cidr}",
+        "format-disconnected": "󰖪",
+        "tooltip-format-disconnected": "Disconnected",
+        "interval": 5,
+    },
+    "cpu": {
+        "format": "{usage: >3}%",
+        "on-click": "gnome-terminal -- fish -i -c htop"
+    },
+    "memory": {
+        "format": "{: >3}%",
+        "on-click": "gnome-terminal -- fish -i -c htop"
+    },
+    "temperature": {
+        "critical-threshold": 80,
+        "format-critical": " {temperatureC}°C",
+        "format": " {temperatureC}°C",
+        "tooltip-format": "{temperatureC}° Celsius\n{temperatureF}° Fahrenheit\n{temperatureK}° Kelvin",
+    },    
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "",
+            "deactivated": ""
+        },
+        "tooltip-format-activated": "Idle Inhibitor Activated",
+        "tooltip-format-deactivated": "Idle Inhibitor Deactivated"
+    },
+    "backlight": {
+        "format": "{icon} {percent: >3}%",
+        "format-icons": ["", ""],
+        "tooltip-format": "Backlight: {percent: >3}%",
+    },
+    "pulseaudio": {
+        "scroll-step": 5,
+        "format": "{icon}{volume: >3}%",
+        "format-bluetooth": "{icon}{volume: >3}%",
+        "format-muted":"",
+        "format-icons": {
+            "headphones": "",
+            "handsfree": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", ""]
+        },
+        "on-click": "pavucontrol"
+    },
+    "battery": {
+        "states": {
+            "warning": 20,
+            "critical": 10
+        },
+        "tooltip-format": "Power: {power} W",
+        "format-critical": "󰀦 {icon}{capacity: >3}%",
+        "format": "{icon}{capacity: >3}%",
+        "format-icons": ["", "", "", "", "", ""]
+    },
+    "clock": {
+        "interval": 1,
+        "format": "  {:%H:%M:%S}",
+        "tooltip-format": " {:%A %d/%m/%y}\n\n<tt><small>{calendar}</small></tt>",
+        "calendar": {
+            "on-scroll": 1,
+            "format": {
+                "months":     "<span color='#efdac3'>{}</span>",
+                "days":       "<span color='#dcb6c9'>{}</span>",
+                "weeks":      "<span color='#89efcd'>W{}</span>",
+                "weekdays":   "<span color='#efbc56'>{}</span>",
+                "today":      "<span color='#ef5689'><u>{}</u></span>"
+            },
+        },
+        "actions": {
+            "on-scroll-up": "shift_up",
+            "on-scroll-down": "shift_down"
+        },
+    },
+    "tray": {
+        "icon-size": 24
+    },
+    "custom/power": {
+      	"format":"⏻",
+       	"on-click": "nwgbar",
+      	"tooltip": false,
+    },
+}
