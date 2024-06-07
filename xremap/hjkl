@@ -6,3 +6,7 @@ keymap:
       CapsLock-h: Left
       CapsLock-j: Down
       CapsLock-l: Right
+      CapsLock-w: Up
+      CapsLock-a: Left
+      CapsLock-s: Down
+      CapsLock-d: Right
