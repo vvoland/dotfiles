@@ -1,3 +1,3 @@
 function commit
-  git commit -v -S -s $argv
+  git commit -S -s -v $argv; 
 end
