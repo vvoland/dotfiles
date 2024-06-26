@@ -1,9 +1,9 @@
 set fish_greeting
 
-set --local theme Light
+set theme Light
 
 if test -f /usr/bin/defaults
-    set --local theme (defaults read -g AppleInterfaceStyle 2>/dev/null)
+    set theme (defaults read -g AppleInterfaceStyle 2>/dev/null)
 end
 
 if test "$theme" = "Dark"
