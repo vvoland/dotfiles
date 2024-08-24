@@ -10,6 +10,7 @@ vim.cmd([[
     set mouse=
     set softtabstop=4
     set completeopt=menu,menuone,noselect
+    set notermguicolors
 
     call plug#begin("~/.cache/nvim-plug")
     Plug 'junegunn/fzf.vim'
