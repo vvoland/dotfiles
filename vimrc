@@ -3,8 +3,9 @@ set shiftwidth=4
 set tabstop=4
 set softtabstop=4
 set clipboard+=unnamedplus
-set relativenumber
 set nu
+set relativenumber
+set rnu
 
 call plug#begin('~/.cache/vim-plugged')
 Plug 'junegunn/fzf.vim'
