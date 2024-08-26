@@ -10,14 +10,14 @@ set $rofi_cmd rofi \
         -terminal '$term'
 set $menu $rofi_cmd -show-icons -show combi -combi-modes drun#run -modes combi -display-drun "" -display-combi ""
 
-set $wallpaper /home/pawel/Obrazy/ventura.png
+set $wallpaper /home/pawel/Obrazy/desert.jpg
 set $wallpaperblur /home/pawel/Obrazy/ventura-blurred.jpg
 #set $wallpaper /home/pawel/Obrazy/6ncgjN.jpg
 #output * bg /usr/share/backgrounds/default.png fill
 output * bg $wallpaper fill
 
 bindsym Mod4+l exec swaylock
-bindsym Mod4+s exec /home/pawel/dotfiles/bin/sway-screenshot
+bindsym Mod4+s exec flameshot gui 
 
 #
 ### Idle configuration
@@ -159,7 +159,7 @@ smart_gaps on
 smart_borders no_gaps
 
 default_border pixel 2
-font monospace 0
+font monospace 1
 set $border #55B5F9
 client.focused $border $border #ffffff
 
