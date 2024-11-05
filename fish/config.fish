@@ -1,14 +1,17 @@
 set fish_greeting
 
-set --local theme Light
+set --local theme Dark
 
 if test -f /usr/bin/defaults
     set --local theme (defaults read -g AppleInterfaceStyle 2>/dev/null)
 end
 
+export EDITOR=nvim
+export TERM=xterm
+
 if test "$theme" = "Dark"
-    /usr/local/bin/theme.sh hemisu-dark
+    theme.sh hemisu-dark
 else
-    /usr/local/bin/theme.sh google-light
+    theme.sh google-light
 end
 
