@@ -6,6 +6,7 @@ if test -f /usr/bin/defaults
     set theme (defaults read -g AppleInterfaceStyle 2>/dev/null)
 end
 
+export TERM=xterm
 if test "$theme" = "Dark"
     /usr/local/bin/theme.sh hemisu-dark
 else
