@@ -5,7 +5,7 @@ set $down j
 set $up k
 set $right l
 
-set $term gnome-terminal
+set $term kitty
 set $rofi_cmd rofi \
         -terminal '$term'
 set $menu $rofi_cmd -show-icons -show combi -combi-modes drun#run -modes combi -display-drun "" -display-combi ""

@@ -8,6 +8,7 @@ end
 
 if status is-interactive
     export EDITOR=nvim
+    export TERM=xterm
     if test "$theme" = "Dark"
         theme.sh hemisu-dark
     else
