@@ -10,7 +10,10 @@ function gpt
 		set token (pass show OpenAI)
 	end
 
-	curl -s https://api.openai.com/v1/chat/completions \
+    #set url "http://macbookpro.lan:11434"
+    set url "https://api.openai.com"
+
+	curl -s $url/v1/chat/completions \
 		-H "Content-Type: application/json" \
 		-H "Authorization: Bearer $token" \
 		-d '{
