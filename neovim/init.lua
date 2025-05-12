@@ -29,6 +29,7 @@ vim.cmd([[
     Plug 'hrsh7th/nvim-cmp'
     Plug 'L3MON4D3/LuaSnip'
     Plug 'hashivim/vim-terraform'
+    Plug 'tpope/vim-sleuth'
     call plug#end()
 
     set notermguicolors
