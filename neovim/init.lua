@@ -14,6 +14,8 @@ vim.cmd([[
 
     call plug#begin("~/.cache/nvim-plug")
     Plug 'junegunn/fzf.vim'
+    Plug 'junegunn/fzf'
+
     Plug 'dylanaraps/wal.vim'
 
     Plug 'fatih/go.vim'
@@ -26,14 +28,16 @@ vim.cmd([[
     Plug 'hrsh7th/cmp-cmdline'
     Plug 'hrsh7th/nvim-cmp'
     Plug 'L3MON4D3/LuaSnip'
+    Plug 'hashivim/vim-terraform'
+    Plug 'tpope/vim-sleuth'
     call plug#end()
 
+    set notermguicolors
     colorscheme wal
 
     nnoremap <expr> <C-p> (len(system('git rev-parse')) ? ':Files' : ':GFiles --recurse-submodules --exclude-standard --cached')."\<CR>"
     nnoremap <C-b> :call fzf#vim#buffers()<CR>
 ]])
-
 
 local nvim_lsp = require('lspconfig')
 local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -61,13 +65,13 @@ local on_attach = function(client, bufnr)
     buf_set_keymap('n', '<leader>]d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
     buf_set_keymap('n', '<leader><space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
     -- Set some keybinds conditional on server capabilities
-    if client.resolved_capabilities.document_formatting then
+    if client.server_capabilities.document_formatting then
         buf_set_keymap("n", "ff", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
-    elseif client.resolved_capabilities.document_range_formatting then
+    elseif client.server_capabilities.document_range_formatting then
         buf_set_keymap("n", "ff", "<cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
     end
     -- Set autocommands conditional on server_capabilities
-    if client.resolved_capabilities.document_highlight then
+    if client.server_capabilities.document_highlight then
         vim.api.nvim_exec([[
         hi LspReferenceRead cterm=bold ctermbg=DarkMagenta guibg=LightYellow
         hi LspReferenceText cterm=bold ctermbg=DarkMagenta guibg=LightYellow

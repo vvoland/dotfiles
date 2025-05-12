@@ -1,0 +1,90 @@
+#!/bin/bash
+
+runArgs=()
+
+wayland=0
+insecure=0
+home=""
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --home)
+            home=$(realpath "$2")
+            shift
+            shift
+            ;;
+
+        --share)
+            path=$(realpath "$2")
+            runArgs+=( "--mount type=bind,src=$path,dst=$path" )
+            shift
+            shift
+            ;;
+
+        --insecure)
+            insecure=1
+            shift
+            ;;
+
+        --gamepad)
+            devev=$(awk '/Xbox Wireless Controller/,EOF' /proc/bus/input/devices | grep Handlers | head -n1 | grep -Eo 'event[0-9]+')
+            if [ -z "$devev" ]; then
+                echo "No controller found, skipping!" >&2
+            else
+                runArgs+=( "--mount type=bind,src=/dev/input,dst=/dev/input,ro" )
+                runArgs+=( "--device /dev/input/$devev --device /dev/input/js0" )
+            fi
+            shift
+            ;;
+
+        --dbus)
+            runArgs+=( "--mount type=bind,src=/run/user/1000/bus,dst=/run/user/1000/bus" )
+            runArgs+=( "--env DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS" )
+            shift
+            ;;
+        --x11)
+            shift
+            ;;
+        --wayland)
+            wayland=1
+            shift
+            ;;
+        --pulse)
+            runArgs+=( "--mount type=bind,src=$XDG_RUNTIME_DIR/pulse,dst=/pulse,ro" )
+            runArgs+=( "--env PULSE_SERVER=unix:/pulse/native" )
+            shift
+            ;;
+        --gpu)
+            runArgs+=( "--device /dev/dri" )
+            shift
+            ;;
+        *) break ;;
+    esac
+done
+
+#runArgs+=( "-u 1000:1000" )
+if [ $insecure -eq 0 ]; then
+    runArgs+=( "--security-opt no-new-privileges" )
+    runArgs+=( "--cap-drop ALL" )
+fi
+runArgs+=( "--tmpfs /tmp" )
+
+runArgs+=( "-e DISPLAY=$DISPLAY" )
+if [ "$wayland" -eq 1 ]; then
+    runArgs+=( "-e XDG_RUNTIME_DIR=/tmp -e WAYLAND_DISPLAY=$WAYLAND_DISPLAY" )
+    runArgs+=( "--mount type=bind,src=$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY,dst=/tmp/$WAYLAND_DISPLAY,ro" )
+else
+    runArgs+=( "--mount type=bind,src=/tmp/.X11-unix/X${DISPLAY#:},dst=/tmp/.X11-unix/X${DISPLAY#:},readonly" )
+fi
+
+if [ "$home" != "" ]; then
+    mkdir -p "$home"
+    chmod 770 "$home"
+
+    runArgs+=( "--mount type=bind,src=${home},dst=/data")
+    runArgs+=( "--mount type=bind,src=${home},dst=/home/steam" )
+    runArgs+=( "-e HOME=/home/steam" )
+fi
+
+
+echo "${runArgs[@]}" | tr ' ' '\n'
