@@ -7,9 +7,21 @@ windrider="""
 font_size 14
 """
 
+macbook="""
+shell /opt/homebrew/bin/fish
+font_size 14
+font_family      family="Terminus (TTF)"
+bold_font        auto
+italic_font      auto
+bold_italic_font auto
+"""
+
 def main():
-    if hostname == "windrider":
-        print(windrider)
+    match hostname.lower():
+        case "winrider":
+            print(windrider)
+        case "macbookpro.lan":
+            print(macbook)
 
 if __name__ == "__main__":
     main()
