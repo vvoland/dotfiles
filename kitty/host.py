@@ -18,7 +18,7 @@ bold_italic_font auto
 
 def main():
     match hostname.lower():
-        case "winrider":
+        case "windrider":
             print(windrider)
         case "macbookpro.lan":
             print(macbook)
