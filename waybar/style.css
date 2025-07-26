@@ -157,6 +157,10 @@ window#waybar {
     color: #436e3c;
 }
 
+#cpu.freq {
+    color: #0077cc;
+}
+
 #temperature {
     color: #6c3f2b;
 }
