@@ -48,6 +48,7 @@
         "network",
         //"idle_inhibitor",
         "cpu",
+        "cpu#freq",
         "temperature",
         "memory",
         "backlight",
@@ -71,6 +72,11 @@
         "format": "{usage: >3}%",
         "on-click": "gnome-terminal -- fish -i -c htop"
     },
+    "cpu#freq": {
+        "format": " {min_frequency}/{max_frequency}GHz",
+        "on-click": "gnome-terminal -- fish -i -c htop",
+        "interval": 5
+    },
     "memory": {
         "format": "{: >3}%",
         "on-click": "gnome-terminal -- fish -i -c htop"
@@ -80,7 +86,7 @@
         "format-critical": " {temperatureC}°C",
         "format": " {temperatureC}°C",
         "tooltip-format": "{temperatureC}° Celsius\n{temperatureF}° Fahrenheit\n{temperatureK}° Kelvin",
-    },    
+    },
     "idle_inhibitor": {
         "format": "{icon}",
         "format-icons": {
