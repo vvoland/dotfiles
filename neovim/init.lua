@@ -11,6 +11,7 @@ vim.cmd([[
     set softtabstop=4
     set completeopt=menu,menuone,noselect
     set notermguicolors
+    set clipboard+=unnamedplus
 
     call plug#begin("~/.cache/nvim-plug")
     Plug 'junegunn/fzf.vim'
