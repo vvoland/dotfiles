@@ -1,4 +1,4 @@
-function dckrhub --argument action --argument ref
+function hub --argument action --argument ref
     set -l r (ociref "$ref")
     set repo $r[1]
     set tag  $r[2]
