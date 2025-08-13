@@ -12,3 +12,7 @@ vim.opt.termguicolors = true
 vim.g.mapleader = "\\"
 -- vim.cmd("colorscheme wal")
 
+vim.api.nvim_create_autocmd({"BufNewFile", "BufRead"}, {
+    pattern = {"*.mdx"},
+    command = "set filetype=markdown"
+})
