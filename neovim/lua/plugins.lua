@@ -1,10 +1,15 @@
 require("lazy").setup({
+  "numToStr/Comment.nvim",
   { "junegunn/fzf.vim",
     dependencies = {
       "junegunn/fzf",
     }
   },
-  "nvim-lualine/lualine.nvim",
+  { "nvim-lualine/lualine.nvim",
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+    }
+  },
   "tpope/vim-sleuth",
   "nvim-treesitter/nvim-treesitter",
   "neovim/nvim-lspconfig",
@@ -14,6 +19,8 @@ require("lazy").setup({
     dependencies = {
       { 'tjdevries/colorbuddy.nvim' }
     },
+    lazy = false,
+    priority = 1000,
   },
   {"hrsh7th/nvim-cmp",
     dependencies = {
@@ -27,6 +34,9 @@ require("lazy").setup({
   },
 })
 
+require('Comment').setup()
+
+-- noirbuddy
 require("noirbuddy").setup({
   colors = {
     primary = '#FFE135',
@@ -34,27 +44,44 @@ require("noirbuddy").setup({
   }
 })
 
+-- lualine + noirbuddy
+local noirbuddy_lualine = require("noirbuddy.plugins.lualine")
+require("lualine").setup {
+  options = {
+    theme = noirbuddy_lualine.theme,
+    icons_enabled = true,
+    filetype = { colored = true },
+    component_separators = { left = "", right = "" },
+    section_separators = { left = "", right = "" },
+    disabled_filetypes = {},
+    always_divide_middle = true,
+  },
+  sections = noirbuddy_lualine.sections,
+  inactive_sections = noirbuddy_lualine.inactive_sections,
+}
+
+
 local map = vim.keymap.set
 
 -- fzf
 -- Files
-vim.keymap.set('n', '<C-p>', function()
-  local git_dir = vim.fn.system('git rev-parse')
+vim.keymap.set("n", "<C-p>", function()
+  local git_dir = vim.fn.system("git rev-parse")
   if #git_dir > 0 then
-    vim.cmd('Files')
+    vim.cmd("Files")
   else
-    vim.cmd('GFiles --recurse-submodules --exclude-standard --cached')
+    vim.cmd("GFiles --recurse-submodules --exclude-standard --cached")
   end
 end, { expr = false, noremap = true, silent = true })
 
 -- Buffers
-vim.keymap.set('n', '<C-b>', function()
-  vim.fn['fzf#vim#buffers']()
+vim.keymap.set("n", "<C-b>", function()
+  vim.fn["fzf#vim#buffers"]()
 end, { noremap = true, silent = true })
 
 -- Lines
-vim.keymap.set('n', '<C-l>', function()
-  vim.fn['fzf#vim#lines']()
+vim.keymap.set("n", "<C-l>", function()
+  vim.fn["fzf#vim#lines"]()
 end, { noremap = true, silent = true })
 
 -- treesitter
@@ -108,6 +135,7 @@ local cmp = require("cmp")
 local luasnip = require("luasnip")
 
 cmp.setup({
+  window = require('noirbuddy.plugins.cmp').window,
   snippet = {
     expand = function(args)
       luasnip.lsp_expand(args.body)
