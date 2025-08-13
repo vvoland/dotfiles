@@ -1,6 +1,10 @@
 require("lazy").setup({
+  { "junegunn/fzf.vim",
+    dependencies = {
+      "junegunn/fzf",
+    }
+  },
   "nvim-lualine/lualine.nvim",
-  "nvim-telescope/telescope.nvim",
   "tpope/vim-sleuth",
   "nvim-treesitter/nvim-treesitter",
   "neovim/nvim-lspconfig",
@@ -32,11 +36,26 @@ require("noirbuddy").setup({
 
 local map = vim.keymap.set
 
--- Telescope
-local telescope = require("telescope.builtin")
-map("n", "<C-p>", telescope.find_files, { desc = "Find Files" })
-map("n", "<leader>fg", telescope.live_grep, { desc = "Live Grep" })
-map("n", "<C-b>", telescope.buffers, { desc = "Find Buffers" })
+-- fzf
+-- Files
+vim.keymap.set('n', '<C-p>', function()
+  local git_dir = vim.fn.system('git rev-parse')
+  if #git_dir > 0 then
+    vim.cmd('Files')
+  else
+    vim.cmd('GFiles --recurse-submodules --exclude-standard --cached')
+  end
+end, { expr = false, noremap = true, silent = true })
+
+-- Buffers
+vim.keymap.set('n', '<C-b>', function()
+  vim.fn['fzf#vim#buffers']()
+end, { noremap = true, silent = true })
+
+-- Lines
+vim.keymap.set('n', '<C-l>', function()
+  vim.fn['fzf#vim#lines']()
+end, { noremap = true, silent = true })
 
 -- treesitter
 require("nvim-treesitter.configs").setup({
