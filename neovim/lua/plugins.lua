@@ -1,5 +1,5 @@
 require("lazy").setup({
-  "numToStr/Comment.nvim",
+  { 'echasnovski/mini.comment', commit = "871746069a28e35d04a66f88bc0e6831779ccc40" },
   { "junegunn/fzf.vim",
     dependencies = {
       "junegunn/fzf",
@@ -35,7 +35,7 @@ require("lazy").setup({
   },
 })
 
-require('Comment').setup()
+require('mini.comment').setup()
 
 -- noirbuddy
 require("noirbuddy").setup({
