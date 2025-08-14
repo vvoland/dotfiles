@@ -129,6 +129,11 @@ lspconfig.bashls.setup({
   capabilities = capabilities,
 })
 
+lspconfig.pylsp.setup({
+  on_attach = on_attach,
+  capabilities = capabilities,
+})
+
 
 -- cmp
 
@@ -180,4 +185,9 @@ cmp.setup({
     { name = "path" },
     { name = "nvim_lua" },
   }),
+})
+
+-- diagnostics
+vim.diagnostic.config({
+  virtual_text = true,
 })
