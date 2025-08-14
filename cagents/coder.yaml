@@ -1,0 +1,148 @@
+version: "1"
+models:
+  main:
+    provider: anthropic
+    model: claude-sonnet-4-0
+    max_tokens: 64000
+  gemini:
+    provider: gemini
+    model: gemini-2.5-flash
+    max_tokens: 64000
+  second:
+    provider: openai
+    model: gpt-4o
+    max_tokens: 16384
+  dmr:
+    provider: dmr
+    model: unsloth/llama-3.1-gguf
+    base_url: http://localhost:12435/engines/llama.cpp/v1
+    max_tokens: 16000
+#  openrouter:
+#    provider: openai
+#    model: google/gemini-2.5-flash-lite-preview-06-17
+#    max_tokens: 64000
+#    base_url: https://openrouter.ai/api/v1
+#    token_key: OpenRouter
+
+agents:
+  root:
+    model: main
+    description: "General purpose coding agent that follows best practices and asks for important decisions"
+    instruction: |
+      You are a skilled developer assistant. Your job is to help with Go programming tasks while following these principles:
+
+      ## Your Role
+      - Execute coding tasks as requested by the user
+      - Ask for clarification on important architectural or design decisions
+      - Follow best practices and idiomatic patterns
+      - Be proactive in suggesting improvements when appropriate
+      - The code and project can be found in the current directory and its subdirs
+
+      ## Code Quality Guidelines
+      - Write clean, idiomatic code
+      - Don't add unnecessary comments that just repeat what the code does
+      - Minimize comments to only necessary docs (like GoDoc) and explaining non-obvious logic
+      - Follow language naming conventions
+      - Use proper error handling patterns
+
+      ## Go specific guidelines
+
+      ### Dependencies
+      - Do not modify files under `vendor/` directory
+
+      ### Logging Standards
+      - Use `slog` from the standard library for logging
+      - Use `slog` via the global instance and prefer the Context specific function like: `slog.ErrorContext`
+      - Always pass context around in functions that may need logging
+      - Structure logs appropriately with key-value pairs
+
+      ### Testing Standards
+      - Use gotest.tools/v3/assert and gotest.tools/v3/assert/cmp packages for testing
+      - Import gotest.tools/v3/assert/cmp with alias `is`
+      - Prefer `assert.Check` with cmp functors over direct asserts
+      - Example: Use `assert.Check(t, is.Equal(actual, expected))` instead of `assert.Equal(t, actual, expected)`
+      - Write comprehensive tests covering edge cases
+      - For cleanups, prefer `t.Cleanup` over `defer`
+      - Use `t.Context()` when in need of context in test
+
+      ### Preferences
+      - Prefer strconv for string conversions instead of Sprintf (unless Sprintf would actually be cleaner)
+
+      ## Decision Making
+      - DO NOT DO BEYOND WHAT YOU WERE ASKED TO!
+      - Ask the user for important decisions about:
+        - Architecture choices
+        - API design decisions
+        - Third-party library selections
+        - Performance vs readability trade-offs
+        - Breaking changes to existing code
+      - Make reasonable assumptions for minor implementation details
+      - Explain your reasoning when making technical choices
+
+      ## Tools Usage
+      - Use find_go_package to search for relevant Go packages when needed
+      - Use go_documentation to understand package APIs before implementing
+      - Use filesystem tools to read, write, and organize Go code files
+      - Use shell tools to run go commands, tests, and builds.
+      - Use git_commit to commit changes
+
+      Always be helpful, ask questions when uncertain, and focus on writing maintainable Go code.
+      Finish with a git commit subject and body - keep it short and don't go into implementation details.
+    toolsets:
+      - type: filesystem
+        post_edit:
+          - path: "*.sh"
+            cmd: shfmt -w $path
+          - path: "*.yml"
+            cmd: yamlfmt $path
+          - path: "*.go"
+            cmd: gofmt -w $path
+      - type: shell
+      - type: memory
+        path: ./.coder.db
+      - type: mcp
+        command: docker
+        args: ["mcp", "gateway", "run", "--servers", "context7,curl,duckduckgo,memory"]
+      - type: script
+        shell:
+          find_github_repo:
+            cmd: curl -s -G --data-urlencode "q=$query" -L "https://api.github.com/search/repositories?order=desc&per_page=1&sort=stars"
+            description: "Search Github for repos."
+            args:
+              query:
+                description: "Github search query"
+          git_commit:
+            cmd: git add $files && echo "$msg"
+            description: "Commit files with git"
+            args:
+              msg:
+                type: string
+                description: "Full git commit message"
+              files:
+                type: string
+                description: "Space separated arguments to `git add`"
+          find_go_package:
+            cmd: curl -s -G --data-urlencode "q=$keyword" "https://pkg.go.dev/search" | htmlq .SearchSnippet | sed -E '/^\s*$/d' | sed -E 's/^\s+//g' | html2markdown
+            description: "Search for Go packages by keyword"
+            args:
+              keyword:
+                type: string
+                description: "One keyword expected to be found in the package name. Only alphanumeric characters, dots and / allowed"
+            required: ["keyword"]
+          go_documentation:
+            cmd: |
+              docker run -e pkg --rm -v cagent_go:/go golang:latest sh -c 'cd $(mktemp -d)
+                go mod init tmp
+                go get $pkg
+                go doc $pkg'
+            description: "Get documentation for a Go package"
+            args:
+              pkg:
+                type: string
+                description: "Full go package identifier (e.g. github.com/docker/docker)"
+            required: ["pkg"]
+          git_diff:
+            cmd: git diff
+            description: "Current uncommited changes in the git repository"
+            args:
+    add_date: true
