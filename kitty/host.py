@@ -4,8 +4,8 @@ import socket
 hostname=socket.gethostname()
 
 windrider="""
-font_size 17.3
-font_family      family="Terminus (TTF)"
+font_size 16
+font_family      family="Adwaita Mono"
 
 bold_font        auto
 italic_font      auto
