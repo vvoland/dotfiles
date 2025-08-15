@@ -1,10 +1,11 @@
 require("lazy").setup({
-  { 'echasnovski/mini.comment', commit = "871746069a28e35d04a66f88bc0e6831779ccc40" },
-  { "junegunn/fzf.vim",
-    dependencies = {
-      "junegunn/fzf",
-    }
-  },
+  "tomasr/molokai",
+  "olimorris/onedarkpro.nvim",
+  "Shatur/neovim-ayu",
+  "lspcontainers/lspcontainers.nvim",
+  "echasnovski/mini.icons",
+  { "echasnovski/mini.comment", commit = "871746069a28e35d04a66f88bc0e6831779ccc40" },
+  { "ibhagwan/fzf-lua" },
   { "nvim-lualine/lualine.nvim",
     dependencies = {
       "nvim-tree/nvim-web-devicons",
@@ -33,23 +34,65 @@ require("lazy").setup({
       "saadparwaiz1/cmp_luasnip",
     },
   },
+  {
+    "echasnovski/mini.diff",
+    config = function()
+      local diff = require("mini.diff")
+      diff.setup({
+        -- Disabled by default
+        source = diff.gen_source.none(),
+      })
+    end,
+  },
+  {
+    "olimorris/codecompanion.nvim",
+    lazy = true,
+    path = "/dev/shm/codecompanion.nvim",
+    opts = {
+      adapters = {
+        openai = function()
+          return require("codecompanion.adapters").extend("openai", {
+            env = {
+              api_key = "cmd: pass show OpenAI",
+            },
+          })
+        end,
+      },
+      strategies = {
+        chat = {
+          adapter = "openai",
+        },
+        inline = {
+          adapter = "openai",
+        },
+        cmd = {
+          adapter = "openai",
+        },
+      },
+      log_level = "DEBUG",
+    },
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+    },
+  },
 })
 
-require('mini.comment').setup()
-
--- noirbuddy
-require("noirbuddy").setup({
-  colors = {
-    primary = '#FFE135',
-    --primary = '#008080',
+require("mini.comment").setup({
+  mappings = {
+    comment = "<leader>/",
   }
 })
 
+require("fzf-lua").setup()
+
+vim.cmd("colorscheme onedark_dark")
+
 -- lualine + noirbuddy
-local noirbuddy_lualine = require("noirbuddy.plugins.lualine")
+-- local noirbuddy_lualine = require("noirbuddy.plugins.lualine")
 require("lualine").setup {
   options = {
-    theme = noirbuddy_lualine.theme,
+    -- theme = "ayu", --noirbuddy_lualine.theme,
     icons_enabled = true,
     filetype = { colored = true },
     component_separators = { left = "", right = "" },
@@ -57,8 +100,8 @@ require("lualine").setup {
     disabled_filetypes = {},
     always_divide_middle = true,
   },
-  sections = noirbuddy_lualine.sections,
-  inactive_sections = noirbuddy_lualine.inactive_sections,
+  -- sections = noirbuddy_lualine.sections,
+  -- inactive_sections = noirbuddy_lualine.inactive_sections,
 }
 
 
@@ -69,20 +112,21 @@ local map = vim.keymap.set
 vim.keymap.set("n", "<C-p>", function()
   local git_dir = vim.fn.system("git rev-parse")
   if #git_dir > 0 then
-    vim.cmd("Files")
+    FzfLua.files()
   else
-    vim.cmd("GFiles --recurse-submodules --exclude-standard --cached")
+    FzfLua.git_files()
+    -- vim.cmd("GFiles --recurse-submodules --exclude-standard --cached")
   end
 end, { expr = false, noremap = true, silent = true })
 
 -- Buffers
 vim.keymap.set("n", "<C-b>", function()
-  vim.fn["fzf#vim#buffers"]()
+  FzfLua.buffers()
 end, { noremap = true, silent = true })
 
 -- Lines
 vim.keymap.set("n", "<C-l>", function()
-  vim.fn["fzf#vim#lines"]()
+  FzfLua.lines()
 end, { noremap = true, silent = true })
 
 -- treesitter
@@ -91,18 +135,17 @@ require("nvim-treesitter.configs").setup({
   highlight = { enable = true },
 })
 
---vim.api.nvim_create_user_command("Reload", reload, {})
-
 -- lspconfig
 
 local on_attach = function(_, bufnr)
   local opts = { buffer = bufnr, noremap = true, silent = true }
-  map("n", "gd", vim.lsp.buf.definition, opts)
+  map("n", "<leader>gd", vim.lsp.buf.definition, opts)
   map("n", "<leader>h", vim.lsp.buf.hover, opts)
-  map("n", "gi", vim.lsp.buf.implementation, opts)
-  map("n", "gr", vim.lsp.buf.references, opts)
+  map("n", "<leader>gi", vim.lsp.buf.implementation, opts)
+  map("n", "<leader>gr", vim.lsp.buf.references, opts)
   map("n", "<leader>rn", vim.lsp.buf.rename, opts)
   map("n", "<leader><space>", vim.lsp.buf.code_action, opts)
+  map("n", "<leader>ff", vim.lsp.buf.format, opts)
 end
 
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
@@ -123,15 +166,20 @@ lspconfig.gopls.setup({
   },
 })
 
+local lspcontainers = require("lspcontainers")
+
 
 lspconfig.bashls.setup({
-  on_attach = on_attach,
-  capabilities = capabilities,
+  on_attach = on_attach, capabilities = capabilities
+})
+lspconfig.pylsp.setup({
+  cmd = lspcontainers.command("pylsp"),
+  on_attach = on_attach, capabilities = capabilities,
 })
 
-lspconfig.pylsp.setup({
-  on_attach = on_attach,
-  capabilities = capabilities,
+lspconfig.html.setup({
+  cmd = lspcontainers.command("html"),
+  on_attach = on_attach, capabilities = capabilities,
 })
 
 
@@ -185,9 +233,18 @@ cmp.setup({
     { name = "path" },
     { name = "nvim_lua" },
   }),
-})
+}
+)
 
 -- diagnostics
 vim.diagnostic.config({
   virtual_text = true,
 })
+
+
+-- require("ai").setup()
+
+vim.keymap.set({ "n", "v" }, "<leader>ai", function()
+  require("codecompanion")
+  vim.cmd("CodeCompanion")
+end, { noremap = true, silent = true })
