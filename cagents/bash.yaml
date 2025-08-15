@@ -1,0 +1,95 @@
+version: "1"
+
+models:
+  claude:
+    provider: anthropic
+    model: claude-sonnet-4-0
+    max_tokens: 64000
+
+agents:
+  root:
+    model: claude
+    description: "Expert bash script writer with linting and formatting capabilities"
+    instruction: |
+      You are a bash scripting expert who writes clean, well-documented, and properly formatted shell scripts.
+      
+      Your responsibilities include:
+      1. Writing bash scripts following best practices and POSIX compliance when possible
+      2. Using proper error handling with set -euo pipefail when appropriate
+      3. Adding comprehensive comments and documentation
+      4. Automatically linting scripts with shellcheck to catch potential issues
+      5. Formatting scripts with shfmt for consistent style
+      6. Explaining any shellcheck warnings or errors and how to fix them
+      7. Suggesting improvements for performance, security, and maintainability
+      
+      Workflow for every script you create or modify:
+      1. Write the initial script with proper shebang and error handling
+      2. Run shellcheck to identify any issues
+      3. Fix any critical issues found by shellcheck
+      4. Run shfmt to format the script consistently
+      5. Explain the purpose and usage of the script
+      6. Highlight any important considerations or potential improvements
+      
+      Always use these shellcheck and shfmt options:
+      - shellcheck
+      - shfmt
+      
+      Follow these best practices:
+      - The script should be single file
+      - Keep it as simple and focused as possible
+      - Do not add comments that repeat what the code does
+      - Try to use some colors if possible (via ansi escape codes)
+      - Prefer stderr for non essential debug/info information
+
+    toolsets:
+      - type: filesystem
+        post_edit:
+          - path: "*.sh"
+            cmd: shfmt -i 4 -bn -ci -w "$path"
+      #- type: shell
+      - type: script
+        shell:
+          lint_script:
+            cmd: shellcheck --severity=style --format=tty "$path"
+            description: "Lint a bash script with shellcheck"
+            args:
+              path:
+                type: string
+                description: "Path to the script file to lint"
+            required: ["path"]
+          
+          format_script:
+            cmd: shfmt -i 4 -bn -ci -w "$path"
+            description: "Format a bash script with shfmt"
+            args:
+              path:
+                type: string
+                description: "Path to the script file to format"
+            required: ["path"]
+          
+          check_script_syntax:
+            cmd: bash -n "$path"
+            description: "Check bash script syntax without executing"
+            args:
+              path:
+                type: string
+                description: "Path to the script file to check"
+            required: ["path"]
+          
+          make_executable:
+            cmd: chmod +x "$path"
+            description: "Make a script file executable"
+            args:
+              path:
+                type: string
+                description: "Path to the script file to make executable"
+            required: ["path"]
+          
+          manpage:
+            cmd: "man $cmd"
+            description: "View manpage manual for command"
+            args:
+              cmd:
+                type: string
+                description: "Command"
+            required: ["cmd"]
