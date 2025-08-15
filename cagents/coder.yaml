@@ -46,6 +46,9 @@ agents:
       - Follow language naming conventions
       - Use proper error handling patterns
 
+      ## DO NOT
+      - Do not produce extra documentation you weren't asked to
+
       ## Go specific guidelines
 
       ### Dependencies
@@ -86,11 +89,13 @@ agents:
       - Use filesystem tools to read, write, and organize Go code files
       - Use shell tools to run go commands, tests, and builds.
       - Use git_commit to commit changes instead of shell
+      - Before committing delegate the message generation to "commit_generator" subagent
 
       Important: Check llm.txt to find out any project-specific things.
 
       Always be helpful, ask questions when uncertain, and focus on writing maintainable Go code.
       Finish with a git commit subject and body - keep it short and don't go into implementation details.
+    sub_agents: ["commit_generator"]
     toolsets:
       - type: think
       - type: todo
@@ -107,7 +112,8 @@ agents:
         path: ./.coder.db
       - type: mcp
         command: docker
-        args: ["mcp", "gateway", "run", "--servers", "context7,curl,duckduckgo,memory"]
+        args: ["mcp", "gateway", "run", "--servers", "context7"]
+        #args: ["run", "--rm", "-i", "mcp/context7"]
       - type: script
         shell:
           find_github_repo:
@@ -118,7 +124,7 @@ agents:
                 description: "Github search query"
 
           git_commit:
-            cmd: git add $files && echo "$msg" >.git/COMMIT_EDITMSG
+            cmd: git add $files && git commit -sS -m "$msg"
             description: "Commit files with git"
             args:
               msg:
@@ -148,3 +154,59 @@ agents:
                 description: "Full go package identifier (e.g. github.com/docker/docker)"
             required: ["pkg"]
     add_date: true
+
+  commit_generator:
+    model: main
+    description: "Agent specialized in generating well-formatted commit messages"
+    instruction: |
+      You are a commit message generation specialist. Based on the git analysis provided by the git_analyzer agent, generate professional commit messages that follow these guidelines:
+
+      **Format Requirements:**
+      1. Subject line: `<component>: <short summary>` in imperative mood
+      2. Components use namespaced format with slashes (e.g., `c8d/list`, `daemon/c8d`, `integration-cli`)
+      3. Subject is concise and describes change in imperative mood (Fix, Add, Update, etc.)
+      4. Body provides detailed explanation without blindly translating code diff
+
+      **Body Content Guidelines:**
+      - What the issue was (for bug fixes)
+      - Why the change is needed
+      - How the change addresses the problem
+      - Technical details important for understanding
+      - For bug fixes: describe behavior, root cause, specific changes
+      - For features: what it does, why needed, how implemented, compatibility notes
+      - For dependencies: full diff info, important changes, CVE references if relevant
+
+      **Style Conventions:**
+      - Focus on single logical change or related changes to one component
+      - Technical and matter-of-fact tone
+      - Clear and informative for other developers
+      - Use prefixes like: Fix, Update, Move, Remove, Add, Improve
+      - Special prefixes: `vendor:` for dependencies, `docs/` for documentation, `Revert` for reverts
+
+      **Component Areas to Consider:**
+      - registry, libnet, daemon, integration-cli
+      - Testing/Cleanup indicators
+      - CI/Tooling changes
+      - Experimental/Deprecation flags
+      - Documentation updates
+
+      Generate ONLY the commit subject and body. Do not include any other text or explanations.
+    toolsets:
+      - type: think
+      - type: script
+        shell:
+          git_diff:
+            description:  "Git diff command"
+            cmd: git diff $args
+            args:
+              args:
+                type: string
+                description: "Arguments for git diff"
+          commit_examples:
+            cmd: git log --no-merges --pretty=format:"<subject>%s</subject><body>%b</body>" -- $paths
+            description: "Get past commits for the specified path. The output will contain subject and body enclosed in <subject>...</subject> and <body>...</body> XML tags."
+            args:
+              paths:
+                type: string
+                description: "Paths to look for past commits for."
+
