@@ -1,9 +1,9 @@
 require("lazy").setup({
   "tomasr/molokai",
-  "olimorris/onedarkpro.nvim",
-  "Shatur/neovim-ayu",
+  { "olimorris/onedarkpro.nvim", commit = "3891f6f8db49774aa861d08ddc7c18ad8f1340e9" },
+  { "Shatur/neovim-ayu", commit = "8f236d3d65cf55bf0664aefd850c326580152270" },
   "lspcontainers/lspcontainers.nvim",
-  "echasnovski/mini.icons",
+  { "echasnovski/mini.icons", commit = "b8f6fa6f5a3fd0c56936252edcd691184e5aac0c" },
   { "echasnovski/mini.comment", commit = "871746069a28e35d04a66f88bc0e6831779ccc40" },
   { "ibhagwan/fzf-lua" },
   { "nvim-lualine/lualine.nvim",
@@ -15,14 +15,14 @@ require("lazy").setup({
   "nvim-treesitter/nvim-treesitter",
   "neovim/nvim-lspconfig",
   { "hrsh7th/nvim-cmp", dependencies = { "hrsh7th/cmp-nvim-lsp" } },
-  {
-    'jesseleite/nvim-noirbuddy',
-    dependencies = {
-      { 'tjdevries/colorbuddy.nvim' }
-    },
-    lazy = false,
-    priority = 1000,
-  },
+  -- {
+  --   'jesseleite/nvim-noirbuddy',
+  --   dependencies = {
+  --     { 'tjdevries/colorbuddy.nvim' }
+  --   },
+  --   lazy = false,
+  --   priority = 1000,
+  -- },
   {"hrsh7th/nvim-cmp",
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
@@ -59,15 +59,9 @@ require("lazy").setup({
         end,
       },
       strategies = {
-        chat = {
-          adapter = "openai",
-        },
-        inline = {
-          adapter = "openai",
-        },
-        cmd = {
-          adapter = "openai",
-        },
+        chat = { adapter = "openai", },
+        inline = { adapter = "openai", },
+        cmd = { adapter = "openai", },
       },
       log_level = "DEBUG",
     },
@@ -78,11 +72,7 @@ require("lazy").setup({
   },
 })
 
-require("mini.comment").setup({
-  mappings = {
-    comment = "<leader>/",
-  }
-})
+require("mini.comment").setup()
 
 require("fzf-lua").setup()
 
@@ -169,6 +159,12 @@ lspconfig.gopls.setup({
 local lspcontainers = require("lspcontainers")
 
 
+lspconfig.jsonls.setup({
+  on_attach = on_attach, capabilities = capabilities
+})
+lspconfig.html.setup({
+  on_attach = on_attach, capabilities = capabilities
+})
 lspconfig.bashls.setup({
   on_attach = on_attach, capabilities = capabilities
 })
@@ -177,10 +173,15 @@ lspconfig.pylsp.setup({
   on_attach = on_attach, capabilities = capabilities,
 })
 
-lspconfig.html.setup({
-  cmd = lspcontainers.command("html"),
-  on_attach = on_attach, capabilities = capabilities,
-})
+
+lspconfig.yamlls.setup {
+  before_init = function(params)
+    params.processId = vim.NIL
+  end,
+  cmd = lspcontainers.command("yamlls"),
+  image = "quay.io/redhat-developer/yaml-language-server:latest",
+  root_dir = require("lspconfig/util").root_pattern(".git", vim.fn.getcwd()),
+}
 
 
 -- cmp
@@ -189,7 +190,6 @@ local cmp = require("cmp")
 local luasnip = require("luasnip")
 
 cmp.setup({
-  window = require('noirbuddy.plugins.cmp').window,
   snippet = {
     expand = function(args)
       luasnip.lsp_expand(args.body)
