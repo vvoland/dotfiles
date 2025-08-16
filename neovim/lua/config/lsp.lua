@@ -1,5 +1,6 @@
 local on_attach = function(_, bufnr)
   local opts = { buffer = bufnr, noremap = true, silent = true }
+  local map = vim.keymap.set
   map("n", "<leader>gd", vim.lsp.buf.definition, opts)
   map("n", "<leader>h", vim.lsp.buf.hover, opts)
   map("n", "<leader>gi", vim.lsp.buf.implementation, opts)
@@ -9,12 +10,10 @@ local on_attach = function(_, bufnr)
   map("n", "<leader>ff", vim.lsp.buf.format, opts)
 end
 
-local capabilities = require("cmp_nvim_lsp").default_capabilities()
 local lspconfig = require("lspconfig")
 
 lspconfig.gopls.setup({
   on_attach = on_attach,
-  capabilities = capabilities,
   settings = {
     gopls = {
       experimentalPostfixCompletions = true,
@@ -31,17 +30,17 @@ local lspcontainers = require("lspcontainers")
 
 
 lspconfig.jsonls.setup({
-  on_attach = on_attach, capabilities = capabilities
+  on_attach = on_attach,
 })
 lspconfig.html.setup({
-  on_attach = on_attach, capabilities = capabilities
+  on_attach = on_attach,
 })
 lspconfig.bashls.setup({
-  on_attach = on_attach, capabilities = capabilities
+  on_attach = on_attach,
 })
 lspconfig.pylsp.setup({
   cmd = lspcontainers.command("pylsp"),
-  on_attach = on_attach, capabilities = capabilities,
+  on_attach = on_attach,
 })
 
 
