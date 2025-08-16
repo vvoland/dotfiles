@@ -15,3 +15,8 @@ vim.api.nvim_create_autocmd({"BufNewFile", "BufRead"}, {
     pattern = {"*.mdx"},
     command = "set filetype=markdown"
 })
+
+vim.diagnostic.config({
+  virtual_text = true,
+})
+
