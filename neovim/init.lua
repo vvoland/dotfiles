@@ -16,6 +16,6 @@ require("options")
 require("lazy").setup("plugins")
 
 -- cmp needs to load before lsp
-require("config/cmp")
+-- require("config/cmp")
 require("config/lsp")
 
