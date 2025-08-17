@@ -42,6 +42,17 @@ return {
         noremap = true,
         silent = true,
       },
+      -- Grep
+      {
+        "<C-g>",
+        function()
+          require("fzf-lua").live_grep()
+        end,
+        mode = "n",
+        desc = "FzfLua Grep",
+        noremap = true,
+        silent = true,
+      },
     }
   }
 }

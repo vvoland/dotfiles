@@ -43,6 +43,7 @@ lspconfig.pylsp.setup({
   on_attach = on_attach,
 })
 
+local util = require("lspconfig/util")
 
 lspconfig.yamlls.setup {
   before_init = function(params)
@@ -50,5 +51,5 @@ lspconfig.yamlls.setup {
   end,
   cmd = lspcontainers.command("yamlls"),
   image = "quay.io/redhat-developer/yaml-language-server:latest",
-  root_dir = require("lspconfig/util").root_pattern(".git", vim.fn.getcwd()),
+  root_dir = util.root_pattern(".git", vim.fn.getcwd()),
 }
