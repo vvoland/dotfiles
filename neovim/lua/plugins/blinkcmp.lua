@@ -20,7 +20,14 @@ return {
     -- C-k: Toggle signature help (if signature.enabled = true)
     --
     -- See :h blink-cmp-config-keymap for defining your own keymap
-    keymap = { preset = "super-tab" },
+    keymap = {
+      preset = "super-tab",
+      ["<C-l>"] = {
+        function(cmp)
+          cmp.show { providers = { "minuet" } }
+        end,
+      },
+    },
 
     signature = {
       enabled = true,
@@ -37,6 +44,17 @@ return {
 
     sources = {
       default = { "lsp", "path", "snippets", "buffer" },
+      providers = {
+        minuet = {
+          name = "minuet",
+          module = "minuet.blink",
+          async = true,
+          -- Should match minuet.config.request_timeout * 1000,
+          -- since minuet.config.request_timeout is in seconds
+          timeout_ms = 9000,
+          score_offset = 50, -- Gives minuet higher priority among suggestions
+        },
+      },
     },
     fuzzy = { implementation = "lua" }
   },
