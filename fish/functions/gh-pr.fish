@@ -11,14 +11,14 @@ function gh-pr --argument-names nofill
         exit
     end
 
-    set master (git merge-base HEAD upstream/master)
+    set master (git merge-base HEAD upstream/master 2>/dev/null)
     if test -z "$master"
-        set master (git merge-base HEAD upstream/main)
+        set master (git merge-base HEAD upstream/main 2>/dev/null)
     end
     set merge_base "$master...HEAD"
 
-    set body (git log --reverse --format="### %s%n%n%b" "$merge_base" | grep -v Signed-off)
+    set body (git log --reverse --format='### %s%n%n%n%n%b%n' "$merge_base" | grep -v Signed-off)
     set title (git log --reverse --format="%s" "$merge_base" | head -n1)
 
-    echo "$body" | gh pr create -w --head "vvoland:$branch" -R "$repo" --title "$title" -a "@me" --body @ $argv
+    echo "$body" | gh pr create -w --head "vvoland:$branch" -R "$repo" --title "$title" -a "@me" -F - $argv
 end
