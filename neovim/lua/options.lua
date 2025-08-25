@@ -10,6 +10,8 @@ vim.opt.mouse = ""
 vim.opt.completeopt = { "menu", "menuone", "noselect" }
 vim.opt.termguicolors = true
 vim.g.mapleader = "\\"
+vim.opt.list = true
+vim.opt.listchars = { space = " ", tab = "→ ", trail = "·" }
 
 vim.api.nvim_create_autocmd({"BufNewFile", "BufRead"}, {
     pattern = {"*.mdx"},
