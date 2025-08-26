@@ -8,7 +8,7 @@ return {
           local secrets = require("secrets")
           return require("codecompanion.adapters").extend("openai", {
             env = {
-              api_key = secrets.pass_func("OpenAI")
+              api_key = secrets.pass_func("OpenAI"),
             },
           })
         end,
