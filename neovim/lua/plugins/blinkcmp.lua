@@ -22,11 +22,11 @@ return {
     -- See :h blink-cmp-config-keymap for defining your own keymap
     keymap = {
       preset = "super-tab",
-      ["<C-l>"] = {
-        function(cmp)
-          cmp.show { providers = { "minuet" } }
-        end,
-      },
+      -- ["<C-l>"] = {
+      --   function(cmp)
+      --     cmp.show { providers = { "minuet" } }
+      --   end,
+      -- },
     },
 
     signature = {

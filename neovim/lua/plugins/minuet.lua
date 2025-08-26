@@ -9,10 +9,16 @@ return {
     config = function()
       local secrets = require("secrets")
       require("minuet").setup {
-        -- provider = "openai",
-        provider = "openai_fim_compatible",
-        context_window = 512,
-        request_tieout = 9000,
+        provider = "openai",
+        -- provider = "openai_fim_compatible",
+        request_timeout = 9000,
+        virtualtext = {
+          keymap = {
+            accept = "<tab>",
+            accept_line = "<C-j>",
+            next = "<C-l>",
+          },
+        },
         provider_options = {
           claude = {
             model = "claude-sonnet-4-0",
@@ -24,6 +30,7 @@ return {
             api_key = secrets.pass_func("OpenAI"),
           },
           openai_fim_compatible = {
+            context_window = 512,
             -- For Windows users, TERM may not be present in environment variables.
             -- Consider using APPDATA instead.
             api_key = "TERM",
