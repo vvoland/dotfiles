@@ -7,7 +7,10 @@ local on_attach = function(_, bufnr)
   map("n", "<leader>gr", vim.lsp.buf.references, opts)
   map("n", "<leader>rn", vim.lsp.buf.rename, opts)
   map("n", "<leader><space>", vim.lsp.buf.code_action, opts)
-  map("n", "<leader>ff", vim.lsp.buf.format, opts)
+  map("n", "<leader>ff", function()
+    vim.lsp.buf.format()
+    vim.lsp.buf.code_action({ context = { only = { "source.organizeImports" } }, apply = true })
+  end, opts)
 end
 
 local lspconfig = require("lspconfig")
