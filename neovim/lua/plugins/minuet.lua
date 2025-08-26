@@ -7,12 +7,22 @@ return {
     lazy = false,
     priority = 100,
     config = function()
+      local secrets = require("secrets")
       require("minuet").setup {
         -- provider = "openai",
         provider = "openai_fim_compatible",
         context_window = 512,
         request_tieout = 9000,
         provider_options = {
+          claude = {
+            model = "claude-sonnet-4-0",
+            api_key = secrets.pass_func("Anthropic")
+          },
+          openai = {
+            model = "gpt-4o",
+            stream = true,
+            api_key = secrets.pass_func("OpenAI"),
+          },
           openai_fim_compatible = {
             -- For Windows users, TERM may not be present in environment variables.
             -- Consider using APPDATA instead.
@@ -38,19 +48,6 @@ return {
                 .. "<|fim_middle|>"
               end,
               suffix = false,
-            },
-          },
-          openai = {
-            model = "gpt-4.1-mini",
-            stream = true,
-            api_key = "OPENAI_API_KEY",
-            optional = {
-              -- pass any additional parameters you want to send to OpenAI request,
-              -- e.g.
-              -- stop = { "end" },
-              -- max_tokens = 256,
-              -- top_p = 0.9,
-              -- reasoning_effort = "minimal"
             },
           },
         },

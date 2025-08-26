@@ -5,9 +5,10 @@ return {
     opts = {
       adapters = {
         openai = function()
+          local secrets = require("secrets")
           return require("codecompanion.adapters").extend("openai", {
             env = {
-              api_key = "cmd: pass show OpenAI",
+              api_key = secrets.pass_func("OpenAI")
             },
           })
         end,
