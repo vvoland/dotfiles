@@ -9,12 +9,12 @@ return {
     config = function()
       local secrets = require("secrets")
       require("minuet").setup {
-        provider = "openai",
-        -- provider = "openai_fim_compatible",
+        -- provider = "openai",
+        provider = "openai_fim_compatible",
         request_timeout = 9000,
         virtualtext = {
           keymap = {
-            accept = "<tab>",
+            accept = "<C-;>",
             accept_line = "<C-j>",
             next = "<C-l>",
           },
@@ -30,19 +30,20 @@ return {
             api_key = secrets.pass_func("OpenAI"),
           },
           openai_fim_compatible = {
-            context_window = 512,
+            context_window = 1024,
             -- For Windows users, TERM may not be present in environment variables.
             -- Consider using APPDATA instead.
             api_key = "TERM",
             name = "Llama.cpp",
-            end_point = "http://localhost:8012/v1/completions",
+            -- end_point = "http://localhost:8012/v1/completions",
+            end_point = "http://localhost:12435/engines/llama.cpp/v1/completions",
             -- The model is set by the llama-cpp server and cannot be altered
             -- post-launch.
-            model = "PLACEHOLDER",
-            optional = {
-              max_tokens = 56,
-              top_p = 0.9,
-            },
+            model = "ai/qwen3-coder:30B-A3B-UD-Q4_K_XL",
+            -- optional = {
+            --   max_tokens = 56,
+            --   top_p = 0.9,
+            -- },
             -- Llama.cpp does not support the `suffix` option in FIM completion.
             -- Therefore, we must disable it and manually populate the special
             -- tokens required for FIM completion.
