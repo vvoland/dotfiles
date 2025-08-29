@@ -45,6 +45,9 @@ lspconfig.pylsp.setup({
   cmd = lspcontainers.command("pylsp"),
   on_attach = on_attach,
 })
+lspconfig.terraformls.setup({
+  on_attach = on_attach,
+})
 
 local util = require("lspconfig/util")
 
