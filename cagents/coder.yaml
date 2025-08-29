@@ -51,8 +51,9 @@ agents:
 
       ## Go specific guidelines
 
-      ### Dependencies
+      ### vendor
       - Do not modify files under `vendor/` directory
+      - When searching for strings be very careful with the `vendor/` directory. Ignore it, unless you specifically want to also search in the dependencies code.
 
       ### Logging Standards
       - Use `slog` from the standard library for logging
@@ -121,6 +122,7 @@ agents:
             description: "Search Github for repos."
             args:
               query:
+                type: string
                 description: "Github search query"
 
           git_commit:
