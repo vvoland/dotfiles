@@ -1,5 +1,9 @@
 set fish_greeting
 
+if not test -t 1
+    return
+end
+
 set theme Dark
 
 if test -f /usr/bin/defaults
