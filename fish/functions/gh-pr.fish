@@ -17,8 +17,8 @@ function gh-pr --argument-names nofill
     end
     set merge_base "$master...HEAD"
 
-    set body (git log --reverse --format='### %s%n%n%n%n%b%n' "$merge_base" | grep -v Signed-off)
+    set body (git log --reverse --format='### %s%n%n%b%n' "$merge_base" | grep -v Signed-off | string collect)
     set title (git log --reverse --format="%s" "$merge_base" | head -n1)
 
-    echo "$body" | gh pr create -w --head "vvoland:$branch" -R "$repo" --title "$title" -a "@me" -F - $argv
+    gh pr create -w --head "vvoland:$branch" -R "$repo" --title "$title" -a "@me" --body "$body" $argv
 end
