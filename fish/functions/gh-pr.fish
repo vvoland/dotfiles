@@ -6,19 +6,33 @@ function gh-pr --argument-names nofill
     echo "Repo: $repo"
     echo "Branch: $branch"
 
+    set master (git log --oneline --format='%d' -n 50 |
+        grep 'upstream/' |
+        head -n1 |
+        string match -g -r 'upstream/([\w.-]+)'
+    )
+
+    if test -z "$master"
+        echo "No base branch found" >&2
+        return 1
+    end
+
+    echo "Base branch: $master"
+
+
     if test -n "$nofill"
         gh pr create -w --head "vvoland:$branch" -R "$repo" -a "@me" "$argv"
         exit
     end
 
-    set master (git merge-base HEAD upstream/master 2>/dev/null)
-    if test -z "$master"
-        set master (git merge-base HEAD upstream/main 2>/dev/null)
-    end
+    # set master (git merge-base HEAD upstream/master 2>/dev/null)
+    # if test -z "$master"
+    #     set master (git merge-base HEAD upstream/main 2>/dev/null)
+    # end
     set merge_base "$master...HEAD"
 
-    set body (git log --reverse --format='### %s%n%n%b%n' "$merge_base" | grep -v Signed-off | string collect)
-    set title (git log --reverse --format="%s" "$merge_base" | head -n1)
+    set body (git log --reverse --format='### %s%n%n%b%n' -- "$merge_base" | grep -v Signed-off | string collect)
+    set title (git log --reverse --format="%s" -- "$merge_base" | head -n1)
 
-    gh pr create -w --head "vvoland:$branch" -R "$repo" --title "$title" -a "@me" --body "$body" $argv
+    gh pr create -B "$master" -w --head "vvoland:$branch" -R "$repo" --title "$title" -a "@me" --body "$body" $argv
 end
