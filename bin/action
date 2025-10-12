@@ -1,0 +1,28 @@
+#!/bin/sh
+set -eu
+
+RUNNER_VERSION=11
+
+if [ -z "${WORKFLOWS_DIR:-}" ]; then
+    if [ -z "${WORKFLOWS_DIR:-}" ] && [ -d ".forgejo/workflows" ]; then
+        WORKFLOWS_DIR=".forgejo/workflows"
+    fi
+    if [ -z "${WORKFLOWS_DIR:-}" ] && [ -d ".github/workflows" ]; then
+        WORKFLOWS_DIR=".github/workflows"
+    fi
+fi
+
+sock=$(mktemp -u -p "${XDG_RUNTIME_DIR}" docker.XXXXXX)
+
+socat "UNIX-LISTEN:$sock",fork,mode=660 \
+    UNIX-CONNECT:/var/run/docker.sock 2>/dev/null &
+socat_pid=$!
+
+trap 'kill $socat_pid; rm -f $sock' EXIT
+
+docker run --rm -it \
+    --mount type=bind,"src=$sock",dst=/var/run/docker.sock \
+    -v ./:/src:ro \
+    -w /src \
+    "code.forgejo.org/forgejo/runner:$RUNNER_VERSION" \
+    forgejo-runner exec -W "/src/${WORKFLOWS_DIR}/${1:-}"
