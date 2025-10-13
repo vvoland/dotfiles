@@ -1,4 +1,4 @@
-function gh-pr --argument-names nofill
+function gh-pr
     set branch (git rev-parse --abbrev-ref HEAD)
 
     set repo (gh-repo upstream)
@@ -19,10 +19,9 @@ function gh-pr --argument-names nofill
 
     echo "Base branch: $master"
 
-
     if test -n "$nofill"
         gh pr create -w --head "vvoland:$branch" -R "$repo" -a "@me" "$argv"
-        exit
+        return
     end
 
     # set master (git merge-base HEAD upstream/master 2>/dev/null)
@@ -31,8 +30,8 @@ function gh-pr --argument-names nofill
     # end
     set merge_base "$master...HEAD"
 
-    set body (git log --reverse --format='### %s%n%n%b%n' -- "$merge_base" | grep -v Signed-off | string collect)
-    set title (git log --reverse --format="%s" -- "$merge_base" | head -n1)
+    set body (git log --reverse --format='### %s%n%n%b%n' "upstream/$merge_base" -- | grep -v Signed-off | string collect)
+    set title (git log --reverse --format="%s" "upstream/$merge_base" -- | head -n1)
 
     gh pr create -B "$master" -w --head "vvoland:$branch" -R "$repo" --title "$title" -a "@me" --body "$body" $argv
 end
