@@ -1,4 +1,4 @@
-function commit-msg
+function commit-msg --argument extra
    set dirs (dirname (git diff HEAD^ --name-only) | sort -u)
    set examples (git log  --no-merges --pretty=format:"<subject>%n%s%n</subject>%n<body>%n%b%n</body>%n%n" -- $dirs | grep -v 'Signed-off' | head -n 200)
    set system (echo "Based on the provided diff, output a commit subject and body according to the guidelines below. Output NOTHING else except the commit subject and its body.
@@ -39,6 +39,11 @@ This style resembles standard Go project commit convention with a focus on being
 - **Experimental/Deprecation**: Flags that indicate feature warnings or deprecated elements.
 - **CI/Tooling**: Changes in Continuous Integration setups or development tooling.
 - **Documentation**: Begins with `docs/` or `api` indicating updates to documentation.
+
+Here's some additional context for the commit from the human:
+<extra_context>
+$extra
+</extra_context>
 
 Below are example commit subjects and bodies enclosed in corresponding HTML tags (don't output tags for the result though)
 $examples
