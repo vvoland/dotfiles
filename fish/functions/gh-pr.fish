@@ -6,11 +6,13 @@ function gh-pr
     echo "Repo: $repo"
     echo "Branch: $branch"
 
-    set master (git log --oneline --format='%d' -n 50 |
-        grep 'upstream/' |
-        head -n1 |
-        string match -g -r 'upstream/([\w.-]+)'
-    )
+    if test -z "$master"
+        set master (git log --oneline --format='%d' -n 50 |
+            grep 'upstream/' |
+            head -n1 |
+            string match -g -r 'upstream/([\w.-]+)'
+        )
+    end
 
     if test -z "$master"
         echo "No base branch found" >&2
