@@ -14,7 +14,7 @@ bold_italic_font auto
 
 macbook = """
 shell /opt/homebrew/bin/fish
-font_size 14
+font_size 13
 font_family      family="Terminus (TTF)"
 bold_font        auto
 italic_font      auto
