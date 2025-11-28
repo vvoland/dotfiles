@@ -52,7 +52,7 @@ $examples
    set prompt (git diff -U15 --cached | jq -R -s)
 
    if test -x /usr/bin/security
-      set token (security find-generic-password -w -s Anthropic)
+      set token (security find-generic-password -w -s ANTHROPIC_API_KEY)
    end
    if test -z "$token" && command -v pass &>/dev/null
       set token (pass show Anthropic)
