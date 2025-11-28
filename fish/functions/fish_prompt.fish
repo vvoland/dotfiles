@@ -29,10 +29,10 @@ function fish_prompt --description 'Write out the prompt'
 
     echo -n -s \uE0BE
 
-    if test $brightness -gt 150
+    if test $brightness -gt 130
         echo -n -s (set_color -o black)
     else
-        echo -n -s (set_color -o normal) 
+        echo -n -s (set_color -o white)
     end
     echo -n -s (set_color -b \#$color) 
 
