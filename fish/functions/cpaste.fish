@@ -3,11 +3,11 @@ function cpaste
         pbpaste $argv
         return
     end
-    if command -v wl-paste 2>&1 /dev/null
+    if command -v wl-paste 2>&1 >/dev/null
         wl-paste $argv
         return
     end
-    if command -v wl-paste 2>&1 /dev/null
+    if command -v wl-paste 2>&1 >/dev/null
         xclip $argv
         return
     end
