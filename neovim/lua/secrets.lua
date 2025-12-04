@@ -1,7 +1,7 @@
 local M = {}
 
 function M.pass_func(key_name)
-  if vim.fn.executable("security") then
+  if vim.fn.executable("security") == 1 then
     local handle = io.popen("security find-generic-password -w -s " .. key_name)
     local result = handle:read("*l")
     handle:close()
