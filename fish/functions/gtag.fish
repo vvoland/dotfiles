@@ -1,3 +1,3 @@
-function gtag --argument tag
-    git tag -a -s "$tag" -m "$tag" $2 $3 $4
+function gtag --argument tag --argument ref
+    git tag -a -s "$tag" -m "$tag" $ref
 end
