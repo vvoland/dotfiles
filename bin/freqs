@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Print CPU frequencies
+# Lowest
+# Median
+# Highest
+
+cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq \
+    | sort -n \
+    | awk '{ a[i++]=$1; } END { print a[0]; print a[int(i/2)]; print a[int(i-1)]}' \
+    | numfmt   --suffix=Hz --from-unit 1000 --to=si
