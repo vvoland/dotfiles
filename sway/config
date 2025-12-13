@@ -15,7 +15,7 @@ set $wallpaperblur ~/Obrazy/wallpaper-blurred
 #set $wallpaper /home/pawel/Obrazy/6ncgjN.jpg
 #output * bg /usr/share/backgrounds/default.png fill
 
-bindsym Mod4+l exec swaylock
+bindsym Mod4+l exec loginctl lock-session
 bindsym Mod4+s exec flameshot gui 
 
 output * bg $wallpaper fill #000000
@@ -164,8 +164,8 @@ bindsym $mod+r mode "resize"
 input "type:keyboard" {
     xkb_layout pl
     xkb_options caps:none
-    #repeat_delay 600
-    repeat_rate 50
+    repeat_delay 200
+    repeat_rate 35
 }
 
 input "type:touchpad" {
