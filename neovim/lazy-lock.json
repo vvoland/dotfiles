@@ -12,6 +12,7 @@
   "minuet-ai.nvim": { "branch": "main", "commit": "2083b86ea01cb18dc9e7cb7a68f932ea06e999e8" },
   "molokai": { "branch": "master", "commit": "c67bdfcdb31415aa0ade7f8c003261700a885476" },
   "neovim-ayu": { "branch": "master", "commit": "8f236d3d65cf55bf0664aefd850c326580152270" },
+  "nvim-lint": { "branch": "master", "commit": "ae64d6466ed92b68353122d920e314ff2c8dd0a8" },
   "nvim-lspconfig": { "branch": "master", "commit": "b0caeef0d835fbe19df6ad71dbc4345eaaea649c" },
   "nvim-treesitter": { "branch": "master", "commit": "42fc28ba918343ebfd5565147a42a26580579482" },
   "nvim-web-devicons": { "branch": "master", "commit": "c2599a81ecabaae07c49ff9b45dcd032a8d90f1a" },
