@@ -1,0 +1,28 @@
+#!/bin/bash
+
+token=""
+if [ -x /usr/bin/security ]; then
+    token="$(security find-generic-password -w -s OpenAI 2>/dev/null)"
+fi
+if [ -z "$token" ] && command -v pass >/dev/null 2>&1; then
+    token="$(pass show OpenAI 2>/dev/null)"
+fi
+openai="$token"
+
+token=""
+if [ -x /usr/bin/security ]; then
+    token="$(security find-generic-password -w -s Anthropic 2>/dev/null)"
+fi
+if [ -z "$token" ] && command -v pass >/dev/null 2>&1; then
+    token="$(pass show Anthropic 2>/dev/null)"
+fi
+claude="$token"
+
+# CAGENT_MODELS_GATEWAY=https://gw.docker.com/models
+bin="/usr/bin/cagent"
+bin="$HOME/src/cagent/dist/cagent"
+
+TELEMETRY_ENABLED=false \
+OPENAI_API_KEY="$openai" \
+ANTHROPIC_API_KEY="$claude" \
+"$bin" "$@"
