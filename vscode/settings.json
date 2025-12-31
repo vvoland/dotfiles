@@ -1,0 +1,7 @@
+{
+    "editor.lineNumbers": "relative",
+    "vim.handleKeys": {
+        "<C-p>": false
+    },
+    "vim.smartRelativeLine": true
+}
