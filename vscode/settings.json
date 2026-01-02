@@ -1,7 +1,40 @@
 {
-    "editor.lineNumbers": "relative",
+    "vim.smartRelativeLine": true,
     "vim.handleKeys": {
         "<C-p>": false
     },
-    "vim.smartRelativeLine": true
+    "window.commandCenter": true,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "extensions.gallery.serviceUrl": "https://marketplace.visualstudio.com/_apis/public/gallery",
+    "docker.extension.enableComposeLanguageServer": false,
+    "editor.renderLineHighlight": "gutter",
+    "[markdown]": {
+        "editor.unicodeHighlight.ambiguousCharacters": false,
+        "editor.unicodeHighlight.invisibleCharacters": false,
+        "diffEditor.ignoreTrimWhitespace": false,
+        "editor.wordWrap": "on",
+        "editor.quickSuggestions": {
+            "comments": "off",
+            "strings": "off",
+            "other": "off"
+        }
+    },
+    "cursor.cpp.disabledLanguages": [],
+    "[dockercompose]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.autoIndent": "advanced",
+        "editor.quickSuggestions": {
+            "other": true,
+            "comments": false,
+            "strings": true
+        },
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+    "[github-actions-workflow]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+    "makefile.configureOnOpen": false,
+    "editor.lineNumbers": "relative"
 }
