@@ -1,0 +1,87 @@
+---
+shell:
+  datetime_now:
+    description: "Returns date and time"
+    cmd: date
+  github_activity:
+    desription: "Show my latest Github activity"
+    cmd: |
+      gh api /users/vvoland/events?per_page=20 --jq '.[] |
+      {
+        time: .created_at,
+        type: .type,
+        repo: .repo.name,
+        action: .payload.action // "push",
+        title: (.payload.issue.title // .payload.pull_request.title // .payload.ref // ""),
+        number: (.payload.issue.number // .payload.pull_request.number // null),
+        review_state: .payload.review.state // null,
+        comment: (.payload.comment.body // .payload.review.body // null)
+        }'
+  github_pr_diff:
+    cmd: gh pr diff "$github_pr_url"
+    description: "View Github PR diff"
+    args:
+      github_pr_url:
+        type: string
+  github_pr_view:
+    cmd: gh pr view "$github_pr_url" --json title,body,files,labels,url | yq -P
+    description: "View Github PR metadata"
+    args:
+      github_pr_url:
+        type: string
+  github_pr_unresolved_reviews:
+    cmd: |
+      gh api graphql -f query='
+        query($owner:  String!, $repo: String!, $pr: Int!) {
+          repository(owner: $owner, name:   $repo) {
+            pullRequest(number: $pr) {
+              reviewThreads(first:  100) {
+                nodes {
+                  isResolved
+                  comments(first: 100) {
+                    nodes {
+                      url
+                      author { login }
+                      body
+                      diffHunk
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }' -F owner="$owner" -F repo="$repo" -F pr="$pr_number" --jq \
+              '[.data.repository.pullRequest.reviewThreads.nodes[] |
+           select(.isResolved == false) |
+           .comments.nodes[] | {
+             url: .url,
+             author: .author.login,
+             body: .body,
+             diff_hunk: .diffHunk
+           }]' | yq -P
+    description: "List unresolved PR review threads"
+    args:
+      owner:
+        type: string
+      repo:
+        type: string
+      pr_number:
+        type: string
+  github_pr_comments:
+    # cmd: gh api "repos/$owner/$repo/pulls/$pr_number/comments" | yq -P
+    cmd: |
+      gh api "repos/$owner/$repo/pulls/$pr_number/comments" --paginate --jq \
+        '[. [] | {
+          url: .html_url,
+          author: .user.login,
+          body: .body,
+          diff_hunk: .diff_hunk
+        }]' | yq -P
+    description: "List PR comments"
+    args:
+      owner:
+        type: string
+      repo:
+        type: string
+      pr_number:
+        type: string
