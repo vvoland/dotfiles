@@ -3,7 +3,6 @@ models:
   anthropic:
     provider: anthropic
     model: claude-opus-4-5
-    max_tokens: 128000
   openrouter:
     provider: openai
     model: x-ai/grok-code-fast-1
@@ -13,7 +12,7 @@ models:
 
 agents:
   root:
-    model: openrouter
+    model: anthropic
     description: |
       Expert Go developer specializing in containers.
     instruction: |
@@ -76,6 +75,7 @@ agents:
       - Make reasonable assumptions for minor implementation details
       - Explain your reasoning when making technical choices
     toolsets:
+      - type: todo
       - type: filesystem
         post_edit:
           - path: "*.sh"
@@ -96,11 +96,12 @@ agents:
         command: /Users/pawel/go/bin/mcp-shell-script
         args:
           - /Users/pawel/dotfiles/mcp-scripts/github.yaml
+          - /Users/pawel/dotfiles/mcp-scripts/git.yaml
       - type: script
         shell:
           shell:
             cmd: |
-              docker run --rm -it \
+              docker run --rm \
                 -v "$(pwd):/workspace" \
                 -w /workspace \
                 pawelgronowski465/cagent sh \

@@ -9,7 +9,6 @@ models:
   opus:
     provider: anthropic
     model: claude-opus-4-5
-    max_tokens: 128000
 
 agents:
   root:
@@ -81,6 +80,7 @@ agents:
       - Follow golangci-lint rules (.golangci.yml)
       - Use context.Context for cancellation
       - Prefer functional options pattern for configuration
+      - In tests, use t.Context() instead of context.Background()
 
       1. Understand the task and relevant code areas
       2. Read existing code to understand patterns and interfaces
@@ -99,6 +99,7 @@ agents:
       ### Afterthoughts
       - Think if the change is really needed or isn't solving something at the wrong level.
     toolsets:
+      - type: todo
       - type: filesystem
       - type: memory
         path: "dnext.db"
@@ -112,6 +113,7 @@ agents:
         command: /Users/pawel/go/bin/mcp-shell-script
         args:
           - /Users/pawel/dotfiles/mcp-scripts/github.yaml
+          - /Users/pawel/dotfiles/mcp-scripts/git.yaml
       - type: script
         shell:
           build:
@@ -150,7 +152,7 @@ agents:
             required: ["PACKAGE"]
           shell:
             cmd: |
-              docker run --rm -it \
+              docker run --rm \
                 -v "$(pwd):/workspace" \
                 -w /workspace \
                 pawelgronowski465/cagent sh \
