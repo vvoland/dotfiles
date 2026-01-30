@@ -1,0 +1,32 @@
+---
+shell:
+  get_base_branch:
+    description: "Get the base branch of the current changes. If empty, the local branch is out of date and you should inform the user."
+    cmd: |
+      git log --oneline --format='%d' -n 50 | grep 'upstream/' | head -n1 | grep -oE 'upstream/([[:alnum:]._-]+)' | head -n1
+  git_show:
+    description: "git show"
+    cmd: git show "$ref"
+    args:
+      ref:
+        type: string
+  git_diff:
+    description: "git diff"
+    cmd: git diff "$ref"
+    args:
+      ref:
+        type: string
+  git_log:
+    description: "git log"
+    cmd: git log "$ref"
+    args:
+      ref:
+        type: string
+  git_blame:
+    description: "git blame"
+    cmd: git blame "$ref" -- "$path"
+    args:
+      ref:
+        type: string
+      path:
+        type: string

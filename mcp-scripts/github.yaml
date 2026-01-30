@@ -3,6 +3,18 @@ shell:
   datetime_now:
     description: "Returns date and time"
     cmd: date
+  github_view_issue:
+    description: "View GitHub issue (without comments and replies)"
+    cmd: gh issue view "$github_issue_url" --json title,body,author,labels | yq -P
+    args:
+      github_issue_url:
+        type: string
+  github_view_issue_comments:
+    description: "View GitHub issue (only comments)"
+    cmd: gh issue view "$github_issue_url" --json comments | yq -P
+    args:
+      github_issue_url:
+        type: string
   github_activity:
     desription: "Show my latest Github activity"
     cmd: |
