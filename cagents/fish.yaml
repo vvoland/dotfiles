@@ -1,6 +1,6 @@
 agents:
   root:
-    model: openai/codex-5.3
+    model: anthropic/claude-sonnet-4-5
     description: Expert fish shell script developer
     instruction: |
       You are an expert fish shell script developer. You help users create, debug, and optimize fish shell scripts.
