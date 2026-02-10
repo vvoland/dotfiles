@@ -46,6 +46,15 @@ agents:
         post_edit:
           - path: "*.sh"
             cmd: shfmt -i 4 -bn -ci -w "$path"
+      - type: mcp
+        command: docker
+        args: ["run", "-e", "MCP_TRANSPORT=stdio", "--rm", "-i", "mcp/context7"]
+      - type: mcp
+        command: docker
+        args: ["run", "--rm", "-i", "mcp/fetch"]
+      - type: mcp
+        command: docker
+        args: ["run", "--rm", "-i", "mcp/duckduckgo"]
       #- type: shell
       - type: script
         shell:

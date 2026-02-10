@@ -104,16 +104,17 @@ agents:
       - type: memory
         path: "dnext.db"
       - type: mcp
-        ref: docker:duckduckgo
+        command: docker
+        args: ["run", "-e", "MCP_TRANSPORT=stdio", "--rm", "-i", "mcp/context7"]
       - type: mcp
-        ref: docker:context7
+        command: docker
+        args: ["run", "--rm", "-i", "mcp/fetch"]
       - type: mcp
-        ref: docker:fetch
+        command: docker
+        args: ["run", "--rm", "-i", "mcp/duckduckgo"]
       - type: mcp
         command: /Users/pawel/go/bin/mcp-shell-script
-        args:
-          - /Users/pawel/dotfiles/mcp-scripts/github.yaml
-          - /Users/pawel/dotfiles/mcp-scripts/git.yaml
+        args: ["/Users/pawel/dotfiles/mcp-scripts/github.yaml", "/Users/pawel/dotfiles/mcp-scripts/git.yaml"]
       - type: script
         shell:
           build:

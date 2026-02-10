@@ -22,6 +22,15 @@ agents:
       Focus on practical, production-ready solutions that follow GitHub Actions and shell best practices.
     toolsets:
       - type: filesystem
+      - type: mcp
+        command: docker
+        args: ["run", "-e", "MCP_TRANSPORT=stdio", "--rm", "-i", "mcp/context7"]
+      - type: mcp
+        command: docker
+        args: ["run", "--rm", "-i", "mcp/fetch"]
+      - type: mcp
+        command: docker
+        args: ["run", "--rm", "-i", "mcp/duckduckgo"]
     sub_agents:
       - coder
       - reviewer
@@ -63,6 +72,15 @@ agents:
           - path: "*.yml"
             cmd: yamlfmt $path
       - type: shell
+      - type: mcp
+        command: docker
+        args: ["run", "-e", "MCP_TRANSPORT=stdio", "--rm", "-i", "mcp/context7"]
+      - type: mcp
+        command: docker
+        args: ["run", "--rm", "-i", "mcp/fetch"]
+      - type: mcp
+        command: docker
+        args: ["run", "--rm", "-i", "mcp/duckduckgo"]
       - type: mcp
         command: docker
         args: ["mcp", "gateway", "run", "--servers", "context7,curl,duckduckgo,memory"]
@@ -114,6 +132,15 @@ agents:
       Be blunt. Make the author justify any line that extends beyond the original task.
     toolsets:
       - type: filesystem
+      - type: mcp
+        command: docker
+        args: ["run", "-e", "MCP_TRANSPORT=stdio", "--rm", "-i", "mcp/context7"]
+      - type: mcp
+        command: docker
+        args: ["run", "--rm", "-i", "mcp/fetch"]
+      - type: mcp
+        command: docker
+        args: ["run", "--rm", "-i", "mcp/duckduckgo"]
       - type: mcp
         command: docker
         args: ["mcp", "gateway", "run", "--servers", "context7,curl,duckduckgo,memory"]

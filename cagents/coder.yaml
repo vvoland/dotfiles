@@ -112,7 +112,14 @@ agents:
       - type: memory
         path: ./.coder.db
       - type: mcp
-        ref: docker:context7
+        command: docker
+        args: ["run", "-e", "MCP_TRANSPORT=stdio", "--rm", "-i", "mcp/context7"]
+      - type: mcp
+        command: docker
+        args: ["run", "--rm", "-i", "mcp/fetch"]
+      - type: mcp
+        command: docker
+        args: ["run", "--rm", "-i", "mcp/duckduckgo"]
       - type: script
         shell:
           find_github_repo:

@@ -87,11 +87,14 @@ agents:
       - type: memory
         path: ./.cagent.db
       - type: mcp
-        ref: docker:duckduckgo
+        command: docker
+        args: ["run", "-e", "MCP_TRANSPORT=stdio", "--rm", "-i", "mcp/context7"]
       - type: mcp
-        ref: docker:context7
+        command: docker
+        args: ["run", "--rm", "-i", "mcp/fetch"]
       - type: mcp
-        ref: docker:fetch
+        command: docker
+        args: ["run", "--rm", "-i", "mcp/duckduckgo"]
       - type: mcp
         command: /Users/pawel/go/bin/mcp-shell-script
         args:
