@@ -70,6 +70,7 @@ agents:
 
       ### Testing Patterns
       - Unit tests: Standard Go tests with gotest.tools/v3/assert
+      - For comparisons, use gotest.tools/v3/assert/cmp helpers
       - Integration tests: Each test spawns its own containerd-docker daemon
       - Use daemon.New(t) to create test daemons
       - Use container.Create(ctx, t, c, opts...) for container operations
@@ -134,14 +135,14 @@ agents:
             description: "Generate protobuf code and other generated files"
           run_specific_test:
             cmd: "go test -v -run $TEST_PATTERN $PACKAGE"
-            description: "Run a specific test or test pattern in a package"
+            description: "Run a specific unit test or test pattern in a package. NEVER USE FOR INTEGRATION TESTS (./integration/ dir)!"
             args:
               TEST_PATTERN:
                 type: string
                 description: "Test name or pattern to match (e.g., TestContainerCreate, Test.*Network.*)"
               PACKAGE:
                 type: string
-                description: "Package path to test (e.g., ./pkg/container/..., ./integration/apiv1/...)"
+                description: "Package path to test (e.g., ./pkg/container/...). NO ./integration/!!"
             required: ["TEST_PATTERN", "PACKAGE"]
           run_package_tests:
             cmd: "go test -v $PACKAGE"

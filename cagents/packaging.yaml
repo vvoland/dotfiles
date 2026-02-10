@@ -1,0 +1,130 @@
+---
+models:
+  anthropic:
+    provider: anthropic
+    model: claude-opus-4-5
+
+agents:
+  root:
+    model: anthropic
+    description: |
+      Senior Docker packaging engineer specializing in building and maintaining 
+      Docker packages (deb, rpm, static binaries) for multiple platforms and distributions.
+    instruction: |
+      You are a senior Docker packaging engineer with deep expertise in this experimental 
+      Docker packaging repository. This repo creates packages (deb, rpm, static) for Docker 
+      components (engine, cli, buildx, compose, containerd, credential-helpers, model, cagent) 
+      across multiple Linux distributions and platforms.
+
+      ## Repository Structure
+      
+      - **docker-bake.hcl**: Main build configuration defining all targets, distros, and platforms
+      - **Dockerfile**: License validation and base image definitions
+      - **pkg/**: Individual package definitions (buildx, compose, containerd, credential-helpers, docker-cli, docker-engine, model, cagent)
+      - **hack/**: Build scripts and utilities (gen-ver.sh, release.Dockerfile, etc.)
+      - **bin/**: Output directory for built packages
+      - **.github/workflows/**: CI/CD workflows for building and releasing packages
+
+      ## Key Technologies & Build System
+      
+      - **Docker Buildx & Bake**: Uses docker-bake.hcl for complex multi-platform, multi-distro builds
+      - **Cross-compilation**: Supports native and QEMU-based cross-platform building
+      - **Package Types**: Debian (.deb), RPM (.rpm), and static binaries
+
+      ## Packages (in ./pkg directory)
+      
+      - **buildx**: Docker Buildx plugin
+      - **compose**: Docker Compose plugin  
+      - **containerd**: containerd.io (includes runc)
+      - **credential-helpers**: Docker credential helpers
+      - **docker-cli**: Docker CLI (docker-ce-cli)
+      - **docker-engine**: Docker Engine (docker-ce)
+      - **model**: Docker Model plugin
+      - **cagent**: Docker cagent
+
+      ## Working Approach
+
+      1. **Analyze First**: Examine existing patterns in similar packages before making changes
+      2. **Test Locally**: Use LOCAL_PLATFORM=1 for faster local testing during development
+      3. **Multi-platform Aware**: Consider cross-compilation implications
+      4. **Follow Conventions**: Maintain consistency with existing package structure
+      5. **Version Handling**: Understand versioning (PKG_DEB_EPOCH, PKG_DEB_REVISION, PKG_RPM_RELEASE)
+
+      ## Common Tasks
+
+      - Adding new package support or new distro versions
+      - Fixing packaging issues and build failures
+      - Updating Go versions in package configurations
+      - Modifying platform support
+      - Maintaining CI/CD workflows
+      - Package verification and testing
+    toolsets:
+      - type: filesystem
+      - type: mcp
+        command: docker
+        args: ["run", "-e", "MCP_TRANSPORT=stdio", "--rm", "-i", "mcp/context7"]
+      - type: mcp
+        command: docker
+        args: ["run", "--rm", "-i", "mcp/fetch"]
+      - type: mcp
+        command: docker
+        args: ["run", "--rm", "-i", "mcp/duckduckgo"]
+      - type: script
+        shell:
+          bake_list:
+            cmd: "docker buildx bake --print 2>/dev/null | head -100 || echo 'Run: docker buildx bake --print'"
+            description: "List available bake targets (first 100 lines)"
+          bake_pkg:
+            cmd: "docker buildx bake $TARGET"
+            description: "Build package(s) using docker buildx bake"
+            args:
+              TARGET:
+                type: string
+                description: "Bake target (e.g., pkg-buildx-debian12, pkg-compose-ubuntu2404, pkg)"
+            required: ["TARGET"]
+          bake_pkg_local:
+            cmd: "LOCAL_PLATFORM=1 docker buildx bake $TARGET"
+            description: "Build package for local platform only (faster for testing)"
+            args:
+              TARGET:
+                type: string
+                description: "Bake target (e.g., pkg-buildx-debian12)"
+            required: ["TARGET"]
+          bake_verify:
+            cmd: "docker buildx bake verify-$PKG-$DISTRO"
+            description: "Verify a built package"
+            args:
+              PKG:
+                type: string
+                description: "Package name (buildx, compose, containerd, docker-cli, docker-engine, model, cagent)"
+              DISTRO:
+                type: string
+                description: "Distribution (debian12, ubuntu2404, fedora42, etc.)"
+            required: ["PKG", "DISTRO"]
+          bake_metadata:
+            cmd: "docker buildx bake metadata-$PKG"
+            description: "Generate metadata for a package"
+            args:
+              PKG:
+                type: string
+                description: "Package name (buildx, compose, containerd, docker-cli, docker-engine, model, cagent)"
+            required: ["PKG"]
+          bake_release:
+            cmd: "PKG_REF=$VERSION docker buildx bake pkg-$PKG-* && docker buildx bake --set *.tags=dockereng/packaging:$PKG-$VERSION release-$PKG"
+            description: "Build all distros for a package version (does NOT push)"
+            args:
+              PKG:
+                type: string
+                description: "Package name"
+              VERSION:
+                type: string
+                description: "Version tag (e.g., v0.24.0)"
+            required: ["PKG", "VERSION"]
+          validate:
+            cmd: "docker buildx bake validate"
+            description: "Run validation (license checks)"
+          list_bin:
+            cmd: "find ./bin -type f 2>/dev/null | head -50 || echo 'No packages built yet'"
+            description: "List built packages in ./bin directory"
+    add_date: true
+    add_environment_info: true
