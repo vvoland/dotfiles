@@ -176,6 +176,12 @@ input "type:touchpad" {
     pointer_accel 0.2
 }
 
+mode "passthrough" {
+    bindsym $mod+Escape mode "default"
+}
+
+bindsym $mod+Escape mode "passthrough"
+
 #gaps inner 12
 smart_gaps on
 smart_borders no_gaps
