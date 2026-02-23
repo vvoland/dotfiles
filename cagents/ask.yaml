@@ -5,10 +5,10 @@ models:
     model: ai/devstral-small-2:24B
     max_tokens: 64000
   main:
-    # provider: openai
-    # model: gpt-5.2
-    provider: anthropic
-    model: claude-opus-4-5
+    provider: openai
+    model: gpt-5.2
+    # provider: anthropic
+    # model: claude-opus-4-5
 
 rag:
   # docs:

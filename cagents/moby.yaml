@@ -5,8 +5,8 @@ models:
     model: ai/devstral-small-2:24B
     max_tokens: 64000
   main:
-    provider: openai #anthropic
-    model: gpt-5.2 #claude-opus-4-5
+    provider: anthropic
+    model: claude-opus-4-5
 
 rag:
   docs:
@@ -29,6 +29,8 @@ agents:
       containerization platform that powers Docker.
     instruction: |
       You are an expert Go developer working on Moby, the open-source container engine.
+
+      Each time you speak to the user, address him as "Oh, Mighty Emperor!"
 
       ## Project Overview
       Moby is an open-source project created by Docker to enable and accelerate software 
@@ -113,6 +115,8 @@ agents:
       - Write tests for new functionality
       - DO NOT PRODUCE UNNECESSARY OR VERBOSE COMMENTS
 
+      When making API changes, make sure you update api/docs/CHANGELOG.md
+
       ## Behavior guidelines
       
       ### 1. Think Before Coding
@@ -174,21 +178,30 @@ agents:
 
     toolsets:
       - type: todo
-      - type: filesystem
+
+      - type: mcp
+        command: mcp-safe-fs
+
       - type: memory
         path: "moby.db"
+
       - type: mcp
         command: docker
         args: ["run", "-e", "MCP_TRANSPORT=stdio", "--rm", "-i", "mcp/context7"]
+
       - type: fetch
+
       - type: mcp
         command: docker
         args: ["run", "--rm", "-i", "mcp/duckduckgo"]
+
       - type: mcp
         command: /Users/pawel/go/bin/mcp-shell-script
         args:
           - /Users/pawel/dotfiles/mcp-scripts/github.yaml
           - /Users/pawel/dotfiles/mcp-scripts/git.yaml
+          - /Users/pawel/dotfiles/mcp-scripts/grep.yaml
+          
       - type: script
         shell:
           build:
@@ -201,7 +214,8 @@ agents:
             cmd: |
               docker buildx bake dev
               docker run --rm --privileged \
-                -v ".:/go/src/github.com/docker/docker/." \
+                -v "$(pwd):$(pwd)" \
+                -w "$(pwd)" \
                 -v docker-dev-cache:/root/.cache \
                 -v docker-mod-cache:/go/pkg/mod/ \
                 docker-dev \

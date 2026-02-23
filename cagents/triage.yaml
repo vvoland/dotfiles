@@ -3,7 +3,6 @@ models:
   anthropic:
     provider: anthropic
     model: claude-opus-4-5
-    max_tokens: 128000
 
 agents:
   root:
@@ -32,18 +31,48 @@ agents:
         command: /Users/pawel/go/bin/mcp-shell-script
         args:
           - /Users/pawel/dotfiles/mcp-scripts/github.yaml
+      - type: shell
+        sandbox:
+          image: golang:alpine
+          paths:
+            - "/tmp/cagent-lurking:/moby-src:ro"
       - type: script
         shell:
-          shell:
-            cmd: |
-              docker run --rm -it \
-                pawelgronowski465/cagent sh \
-                -c "$CMD"
-            description: "Run a shell command in an Alpine container"
+          ask_moby_maintainer:
+            description: "Whenever you need something that needs to analyze Moby codebase, call this"
             args:
-              CMD:
+              question:
                 type: string
-                description: "The shell command to execute inside the Alpine container"
-            required: ["CMD"]
+                description: "Question about Moby"
+            cmd: |
+              set -e
+              cd /tmp/cagent-lurking
+              git fetch origin
+              git reset --hard origin/master
+              cagent run --yolo ~/cagents/moby.yaml "$question"
+
+        # shell:
+        #   shell:
+        #     cmd: |
+        #       docker run --rm \
+        #         pawelgronowski465/cagent sh \
+        #         -c "$CMD"
+        #     description: "Run a shell command in an Alpine container. This is one-off container and changes won't be persisted."
+        #     args:
+        #       CMD:
+        #         type: string
+        #         description: "The shell command to execute inside the Alpine container"
+        #     required: ["CMD"]
+        #   go:
+        #     cmd: |
+        #       docker run --rm \
+        #         -v go-build-cache:/root/.cache/go-build -v go-mod-cache:/go/pkg/mod  \
+        #         golang:1.25 sh -c "go $ARGS"
+        #     description: "Run a Go command inside a Linux container in the project (e.g., 'build ./...', 'mod tidy', 'vet ./...'). Changes won't be persisted across subsequent runs."
+        #     args:
+        #       ARGS:
+        #         type: string
+        #         description: "Arguments to pass to the go command (e.g., 'build ./...', 'mod tidy', 'fmt ./pkg/...')"
+        #     required: ["ARGS"]
     add_date: true
     add_environment_info: true

@@ -184,7 +184,9 @@ agents:
 
     toolsets:
       - type: todo
-      - type: filesystem
+#      - type: filesystem
+      - type: mcp
+        command: mcp-safe-fs
       - type: memory
         path: "cli.db"
       - type: mcp
@@ -223,20 +225,26 @@ agents:
                 description: "Command to run, can run go test for unit tests"
           test_unit:
             cmd: |
-              make -f docker.Makefile test-unit TEST_FILTER="$TEST_FILTER"
+              make -f docker.Makefile test-unit TESTDIRS="$TESTDIRS" TESTFLAGS="$TESTFLAGS"
             description: "Run unit tests inside dev container"
             args:
-              TEST_FILTER:
+              TESTFLAGS:
                 type: string
-                description: "Go -test.run pattern to filter tests"
+                description: "go test flag to pass"
+              TESTDIRS:
+                type: string
+                description: "dirs to test"
           test_e2e:
             cmd: |
-              make test-e2e TEST_FILTER="$TEST_FILTER"
+              make -f docker.Makefile test-e2e TESTDIRS="$TESTDIRS" TESTFLAGS="$TESTFLAGS"
             description: "Run e2e tests (requires running daemon)"
             args:
-              TEST_FILTER:
+              TESTFLAGS:
                 type: string
-                description: "Go -test.run pattern to filter tests"
+                description: "go test flag to pass"
+              TESTDIRS:
+                type: string
+                description: "dirs to test"
           run_linter:
             cmd: "make -f docker.Makefile lint"
             description: "Run go linter"

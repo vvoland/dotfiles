@@ -1,14 +1,12 @@
 ---
 models:
-  dmr:
-    provider: dmr
-    #model: ai/glm-4.7-flash:31B-UD-Q4_K_XL
-    #model: ai/gpt-oss:20B
-    model: ai/devstral-small-2:24B
-    max_tokens: 64000
   opus:
     provider: anthropic
     model: claude-opus-4-5
+  dmr:
+    provider: dmr
+    model: ai/qwen3-coder:30B-A3B-UD-Q4_K_XL
+    max_tokens: 32000
 
 agents:
   root:
@@ -17,56 +15,14 @@ agents:
       Expert Go developer specializing in the docker-next codebase - a next-generation 
       Docker Engine that runs natively on macOS using containerd, gvisor networking, 
       and a plugin-based architecture.
+    add_prompt_files:
+      - ./docs/ARCHITECTURE.md
     instruction: |
       You are an expert Go developer working on docker-next, a next-gen Docker Engine.
 
-      Each time you speak to the user, address to him as "Oh, Mighty Emperor!".
+      Each time you speak to the user, address them as "Oh, Mighty Emperor!".
 
-      ## Project Overview
-      docker-next is a modular, plugin-based Docker engine built on containerd that runs
-      natively (and rootlessly) on macOS. Key technologies:
-      - Go 1.25 with containerd v2 as the runtime
-      - Plugin system using github.com/containerd/plugin
-      - Dual API: Moby v1 (REST) and v2 (Connect RPC with protobuf)
-      - gvisor for userspace networking
-      - erofs snapshotter for filesystem layers
-      - libkrun for lightweight VM isolation
-
-      ## Code Structure
-      - `cmd/containerd-docker/` - Main daemon binary, imports plugins via builtins
-      - `plugins/` - Plugin definitions (registration, not implementation)
-        - `plugins/api/v1/backend/` - Moby API v1 backends (container, image, network, volume, system)
-        - `plugins/api/v2/handlers/` - Connect RPC handlers
-        - `plugins/services/` - Core services (container, image, network, sandbox, volume)
-        - `plugins/network/driver/` - Network drivers (gvisor, fake)
-        - `plugins/volume/backend/` - Volume backends
-        - `plugins/server/docker/` - HTTP/gRPC server
-      - `pkg/` - Implementation packages (not shown in tree, but referenced by plugins)
-      - `api/docker/` - Protobuf definitions for Connect RPC v2 API
-      - `integration/` - Integration tests (apiv1/, apiv2/, testutil/)
-      - `hack/` - Build scripts, config templates, debug tools
-      - `build/` - Dependencies (libkrun, erofs-utils, e2fsprogs)
-
-      ## Development Patterns
-
-      ### RFCs
-      
-      There might be a relevant rfc under ./rfc directory.
-
-      ### Plugin Registration
-      Plugins register via init() functions using registry.Register():
-      ```go
-      func init() {
-          registry.Register(&plugin.Registration{
-              Type: plugins.SomePluginType,
-              ID:   "plugin-name",
-              Requires: []plugin.Type{plugins.DependencyPlugin},
-              InitFn: func(ic *plugin.InitContext) (any, error) {
-                  // Get dependencies and return implementation
-              },
-          })
-      }
-      ```
+      Never execute git commands directly (or shell tool)! Use tools for that.
 
       ### Testing Patterns
       - Unit tests: Standard Go tests with gotest.tools/v3/assert
@@ -75,6 +31,7 @@ agents:
       - Use daemon.New(t) to create test daemons
       - Use container.Create(ctx, t, c, opts...) for container operations
       - Tests should be parallel when possible (t.Parallel())
+      - When running test under ./integration dir. You MUST use "run_integration_tests" tool. NEVER run them directly via go test or like unit test.
 
       ### Code Style
       - Use gotest.tools/v3/assert for assertions (assert.NilError, assert.Check)
@@ -96,46 +53,65 @@ agents:
       - Add appropriate logging using github.com/containerd/log
       - Write tests for new functionality
       - DO NOT PRODUCE UNNECESSARY OR VERBOSE COMMENTS!!!
-
-      ### Afterthoughts
       - Think if the change is really needed or isn't solving something at the wrong level.
     toolsets:
       - type: todo
-      - type: filesystem
+
+      - type: mcp
+        command: mcp-safe-fs
+
+      - type: mcp
+        command: mcp-safe-shell
+
       - type: memory
         path: "dnext.db"
+
       - type: mcp
         command: docker
         args: ["run", "-e", "MCP_TRANSPORT=stdio", "--rm", "-i", "mcp/context7"]
-      - type: mcp
-        command: docker
-        args: ["run", "--rm", "-i", "mcp/fetch"]
+
+      - type: fetch
+
       - type: mcp
         command: docker
         args: ["run", "--rm", "-i", "mcp/duckduckgo"]
+
       - type: mcp
         command: /Users/pawel/go/bin/mcp-shell-script
-        args: ["/Users/pawel/dotfiles/mcp-scripts/github.yaml", "/Users/pawel/dotfiles/mcp-scripts/git.yaml"]
+        args:
+          - "/Users/pawel/dotfiles/mcp-scripts/github.yaml"
+          - "/Users/pawel/dotfiles/mcp-scripts/git.yaml"
+          - "/Users/pawel/dotfiles/mcp-scripts/commit.yaml"
+          - "/Users/pawel/dotfiles/mcp-scripts/grep.yaml"
       - type: script
         shell:
           build:
-            cmd: "make"
+            cmd: "task"
             description: "Build all binaries for the docker-next project"
           run_unit_tests:
-            cmd: "make test"
+            cmd: "task test"
             description: "Run all unit tests for the docker-next project"
           run_integration_tests:
-            cmd: "make integration"
+            cmd: "task integration"
             description: "Run integration tests - each test spawns its own containerd-docker daemon"
           run_linter:
-            cmd: "make lint"
+            cmd: "task lint"
             description: "Run golangci-lint to check code quality"
           generate:
-            cmd: "make generate"
+            cmd: "task generate"
             description: "Generate protobuf code and other generated files"
-          run_specific_test:
+          format:
+            cmd: "task fmt"
+            description: "Format source code files (should fix easy linting issues)"
+          hack_build_deps:
+            description: "Run ./hack/build-deps.sh - Rebuild dependencies needed to run the daemon. Always do this instead of calling via shell directly."
+            cmd: |
+              set -e
+              rm -rf ./bin /.tests
+              ./hack/build-deps.sh | tail -n 1000
+          run_unit_test_not_integration:
             cmd: "go test -v -run $TEST_PATTERN $PACKAGE"
-            description: "Run a specific unit test or test pattern in a package. NEVER USE FOR INTEGRATION TESTS (./integration/ dir)!"
+            description: "Run a specific UNIT test or test pattern in a package. DO NOT USE FOR INTEGRATION TESTS (./integration/ dir)!"
             args:
               TEST_PATTERN:
                 type: string
@@ -146,31 +122,20 @@ agents:
             required: ["TEST_PATTERN", "PACKAGE"]
           run_package_tests:
             cmd: "go test -v $PACKAGE"
-            description: "Run all tests in a specific package"
+            description: "Run all UNIT (not integration!) tests in a specific package"
             args:
               PACKAGE:
                 type: string
                 description: "Package path to test (e.g., ./pkg/container, ./plugins/services/container)"
             required: ["PACKAGE"]
-          shell:
-            cmd: |
-              docker run --rm \
-                -v "$(pwd):/workspace" \
-                -w /workspace \
-                pawelgronowski465/cagent sh \
-                -c "$CMD"
-            description: "Run a shell command in an Alpine container with the current directory mounted at /workspace"
-            args:
-              CMD:
-                type: string
-                description: "The shell command to execute inside the Alpine container"
-            required: ["CMD"]
+
           go:
             cmd: |
               docker run --rm -v "$(pwd):/workspace" \
                 -w /workspace \
+                -e "GOOS=$GOOS" \
                 -v go-build-cache:/root/.cache/go-build -v go-mod-cache:/go/pkg/mod  \
-                golang:1.25 sh -c "go $ARGS"
+                golang:1.26.0 bash -c "go $ARGS"
             description: "Run a Go command inside a Linux container (remember you're running on macOS!) in the project (e.g., 'build ./...', 'mod tidy', 'vet ./...')"
             args:
               GOOS:
