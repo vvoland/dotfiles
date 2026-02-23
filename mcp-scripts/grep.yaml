@@ -1,0 +1,9 @@
+---
+shell:
+  ripgrep:
+    description: "Use ripgrep to search for things"
+    args:
+      args:
+        type: string
+    cmd: |
+      echo "$args" | xargs rg

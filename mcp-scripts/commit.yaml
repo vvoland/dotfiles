@@ -1,0 +1,15 @@
+---
+shell:
+  git_commit:
+    description: "Git Commits ONLY specified files"
+    cmd: |
+      set -xe
+      git reset HEAD '*'
+      git add $files
+      git commit -m "$message"
+    args:
+      files:
+        type: string
+        description: "Files to add via git add (this will be argument to 'git add '"
+      message:
+        type: string
