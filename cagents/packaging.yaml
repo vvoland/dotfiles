@@ -63,9 +63,7 @@ agents:
       - type: mcp
         command: docker
         args: ["run", "-e", "MCP_TRANSPORT=stdio", "--rm", "-i", "mcp/context7"]
-      - type: mcp
-        command: docker
-        args: ["run", "--rm", "-i", "mcp/fetch"]
+      - type: fetch
       - type: mcp
         command: docker
         args: ["run", "--rm", "-i", "mcp/duckduckgo"]

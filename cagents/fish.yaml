@@ -44,9 +44,7 @@ agents:
     add_environment_info: true
     toolsets:
       - type: filesystem
-      - type: mcp
-        command: docker
-        args: ["run", "--rm", "-i", "mcp/fetch"]
+      - type: fetch
       - type: script
         shell:
           fish_sandbox:

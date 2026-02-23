@@ -75,9 +75,7 @@ agents:
       - If you can't find reliable information, say so honestly
 
     toolsets:
-      - type: mcp
-        command: docker
-        args: ["run", "--rm", "-i", "mcp/fetch"]
+      - type: fetch
       - type: mcp
         command: docker
         args: ["run", "--rm", "-i", "mcp/duckduckgo"]

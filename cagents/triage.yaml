@@ -24,12 +24,7 @@ agents:
       - Stay neutral and factual - No emotional language, no blame, no frustration. Just information.
       - No unnecessary sign-offs - Don't end with "Hope this helps!" or "Let me know if you have questions!" unless needed.
     toolsets:
-      - type: mcp
-        command: docker
-        args: ["run", "-e", "MCP_TRANSPORT=stdio", "--rm", "-i", "mcp/context7"]
-      - type: mcp
-        command: docker
-        args: ["run", "--rm", "-i", "mcp/fetch"]
+      - type: fetch
       - type: mcp
         command: docker
         args: ["run", "--rm", "-i", "mcp/duckduckgo"]
