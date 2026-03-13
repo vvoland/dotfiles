@@ -1,7 +1,7 @@
 ---
 shell:
   git_commit:
-    description: "Git Commits ONLY specified files"
+    description: "Create a Git Commit with ONLY specified files. Use this to check-in atomic changes. Use this instead of executing git in shell tool."
     cmd: |
       set -xe
       git reset HEAD '*'
