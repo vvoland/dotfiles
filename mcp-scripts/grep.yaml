@@ -1,9 +1,10 @@
 ---
 shell:
   ripgrep:
-    description: "Use ripgrep to search for things"
+    description: "Use ripgrep to search for things. This is not a full shell."
     args:
       args:
         type: string
+        description: "ripgrep arguments (not shell syntax)"
     cmd: |
       echo "$args" | xargs rg
