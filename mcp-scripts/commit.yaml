@@ -5,7 +5,7 @@ shell:
     cmd: |
       set -xe
       git reset HEAD '*'
-      git add $files
+      printf '%s\n' "$files" | xargs git add --
       git commit -s -S -m "$message"
     args:
       files:
@@ -18,3 +18,26 @@ shell:
           Use imperative language like "fix" not "fixed".
           Subject format be: "<component>: <description>"
           Example: gha/ci: Add integration test workflow
+  git_fixup:
+    description: "Create a fixup commit with ONLY specified files for the target commit. Use this instead of executing git in shell tool."
+    cmd: |
+      set -xe
+      git reset HEAD '*'
+      printf '%s\n' "$files" | xargs git add --
+      git commit -s -S --fixup "$ref"
+    args:
+      files:
+        type: string
+        description: "Files to add via git add (this will be argument to 'git add '"
+      ref:
+        type: string
+        description: "Commit reference to fix up, for example HEAD~1 or abc123"
+  git_revert:
+    description: "Revert the specified commit non-interactively. Use this instead of executing git in shell tool."
+    cmd: |
+      set -xe
+      git revert --no-edit "$ref"
+    args:
+      ref:
+        type: string
+        description: "Commit reference to revert, for example HEAD or abc123"
