@@ -1,8 +1,5 @@
 ---
 shell:
-  datetime_now:
-    description: "Returns date and time"
-    cmd: date
   github_view_issue:
     description: "View GitHub issue (without comments and replies)"
     cmd: gh issue view "$github_issue_url" --json title,body,author,labels | yq -P
@@ -96,4 +93,14 @@ shell:
       repo:
         type: string
       pr_number:
+        type: string
+  github_repo_iusses:
+    cmd: |
+      echo "$gh_pr_list_args" | xargs gh pr list --repo "$owner_repo" --json "$json_fields" | yq -P
+    args:
+      gh_pr_list_args:
+        type: string
+      json_fields:
+        type: string
+      owner_repo:
         type: string
