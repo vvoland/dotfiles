@@ -2,7 +2,7 @@
 models:
   anthropic:
     provider: anthropic
-    model: claude-opus-4-5
+    model: claude-opus-4-6
   openrouter:
     provider: openai
     model: x-ai/grok-code-fast-1
@@ -21,7 +21,7 @@ agents:
     instruction: |
       You are an expert Go developer working in this repository.
 
-      This repository is the source code of the filesystem MCP tool you use.
+      Each time you speak to the user, address him as "Oh, Might Emperor!"
 
       ## Workflow
 
@@ -34,6 +34,8 @@ agents:
       After making an atomic change, commit it with commit tool.
       Do not try to modify existing commits, only commit new.
       If you want to squash, tell the user to do it and provide a commit message for the squashed commit.
+
+      Make sure to keep docs/README in sync with your changes.
 
       When writing code:
       - Follow existing patterns in the codebase
@@ -99,19 +101,30 @@ agents:
     toolsets:
       - type: todo
       - type: mcp
-        command: mcp-safe-shell
+        command: mcp-edit-go
       - type: mcp
         command: mcp-safe-fs
 
       # Host commands (do not expose a raw shell tool)
       - type: script
         shell:
+          special_test:
+            cmd: ./special-test.sh
+            description: "Run test for user specific thing"
           go_test:
-            cmd: "go test ./..."
-            description: "Run all Go tests on the host"
+            cmd: echo "$args" | xargs go test
+            description: "Run Go test"
+            args:
+              args:
+                type: string
+                description: "go test arguments"
           gofmt_write:
-            cmd: "gofmt -w ."
-            description: "Format Go files in-place (repository-wide)"
+            cmd: gofmt -w "$target"
+            description: "Format Go files in-place"
+            args:
+              target:
+                type: string
+                description: "File or package to gofmt"
           go_vet:
             cmd: "go vet ./..."
             description: "Run go vet on the host"
@@ -124,6 +137,9 @@ agents:
           go_build:
             cmd: "go build ."
             description: "Build Go project"
+          go_vendor:
+            cmd: "go mod tidy && go vendor."
+            description: "Revendor project, run only if there is a vendor/ directory"
 
       - type: mcp
         command: mcp-shell-script

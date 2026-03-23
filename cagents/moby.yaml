@@ -6,7 +6,7 @@ models:
     max_tokens: 64000
   main:
     provider: anthropic
-    model: claude-opus-4-5
+    model: claude-opus-4-6
 
 rag:
   docs:
@@ -182,8 +182,8 @@ agents:
       - type: mcp
         command: mcp-safe-fs
 
-      - type: memory
-        path: "moby.db"
+      - type: mcp
+        command: mcp-edit-go
 
       - type: mcp
         command: docker
@@ -201,6 +201,7 @@ agents:
           - /Users/pawel/dotfiles/mcp-scripts/github.yaml
           - /Users/pawel/dotfiles/mcp-scripts/git.yaml
           - /Users/pawel/dotfiles/mcp-scripts/grep.yaml
+          - /Users/pawel/dotfiles/mcp-scripts/commit.yaml
           
       - type: script
         shell:

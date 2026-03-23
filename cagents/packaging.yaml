@@ -59,14 +59,21 @@ agents:
       - Maintaining CI/CD workflows
       - Package verification and testing
     toolsets:
-      - type: filesystem
+      - type: fetch
+
+      - type: mcp
+        command: mcp-safe-fs
+
+      - type: mcp
+        command: mcp-safe-shell
+
       - type: mcp
         command: docker
         args: ["run", "-e", "MCP_TRANSPORT=stdio", "--rm", "-i", "mcp/context7"]
-      - type: fetch
       - type: mcp
         command: docker
         args: ["run", "--rm", "-i", "mcp/duckduckgo"]
+
       - type: script
         shell:
           bake_list:

@@ -58,6 +58,9 @@ agents:
       - type: todo
 
       - type: mcp
+        command: mcp-edit-go
+
+      - type: mcp
         command: mcp-safe-fs
 
       - type: mcp
