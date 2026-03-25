@@ -104,3 +104,13 @@ shell:
         type: string
       owner_repo:
         type: string
+  github_pr_ci_failures:
+    args:
+      gh_pr_url:
+        type: string
+    cmd: |
+      gh pr checks "$gh_pr_url" --json name,state,link \
+        --jq '.[] | select(.state!="SUCCESS") | .link' \
+        | sed -E 's#.*/actions/runs/([0-9]+)/.*#\1#' \
+        | sort -u \
+        | xargs -I{} gh run view {} --log-failed
