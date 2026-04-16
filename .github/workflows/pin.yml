@@ -15,4 +15,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: vvoland/gha-pin-diff@v1
+      - uses: vvoland/gha-pin-diff@master
