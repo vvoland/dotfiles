@@ -40,6 +40,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Mark workspace as safe
         run: |
@@ -135,15 +136,14 @@ jobs:
           git add neovim/lazy-lock.json
           git commit -m "chore(neovim): update lazy-lock.json"
 
-      - name: Push branch
-        if: steps.changes.outputs.changed == 'true' && github.event_name != 'pull_request'
-        run: |
-
       - name: Create or update pull request
         if: steps.changes.outputs.changed == 'true' && github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.PR_PAT }}
         run: |
+          set -euo pipefail
+          test -n "${GH_TOKEN}"
+
           git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:chore/lazy-lock-update
 
           pr_number="$(gh pr list \
