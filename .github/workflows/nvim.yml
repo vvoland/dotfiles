@@ -132,7 +132,7 @@ jobs:
           git checkout -B chore/lazy-lock-update
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add neovim/lazy-lock.json pr-body.md
+          git add neovim/lazy-lock.json
           git commit -m "chore(neovim): update lazy-lock.json"
 
       - name: Push branch
