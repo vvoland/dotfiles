@@ -1,0 +1,170 @@
+name: Update lazy-lock.json
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/nvim.yml
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-lazy-lock
+  cancel-in-progress: false
+
+jobs:
+  update-lazy-lock:
+    # runs-on: [self-hosted]
+    runs-on: ubuntu-latest
+
+    container:
+      image: archlinux:latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ github.workspace }}
+
+    steps:
+      - name: Install tools
+        run: |
+          pacman -Sy --noconfirm archlinux-keyring
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm git github-cli neovim python
+
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Mark workspace as safe
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Backup current lock file
+        run: |
+          if [ ! -f neovim/lazy-lock.json ]; then
+            echo "neovim/lazy-lock.json not found"
+            exit 1
+          fi
+          cp neovim/lazy-lock.json neovim/lazy-lock.before.json
+
+      - name: Update plugins
+        env:
+          XDG_CONFIG_HOME: ${{ github.workspace }}
+          NVIM_APPNAME: neovim
+        run: |
+          nvim --headless "+Lazy! sync" +qa
+
+      - name: Detect lockfile changes
+        id: changes
+        run: |
+          ls -lah
+          if git diff --quiet -- neovim/lazy-lock.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate PR body
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          python <<'PY'
+          import json
+          from pathlib import Path
+
+          before = json.loads(Path("neovim/lazy-lock.before.json").read_text())
+          after = json.loads(Path("neovim/lazy-lock.json").read_text())
+
+          changed_plugins = []
+          for plugin, new_entry in after.items():
+              old_entry = before.get(plugin)
+              if old_entry is None:
+                  changed_plugins.append((plugin, None, new_entry))
+                  continue
+
+              old_commit = old_entry.get("commit")
+              new_commit = new_entry.get("commit")
+              if old_commit != new_commit:
+                  changed_plugins.append((plugin, old_entry, new_entry))
+
+          removed_plugins = [plugin for plugin in before.keys() if plugin not in after]
+
+          lines = []
+          lines.append("## lazy.nvim lockfile updates")
+          lines.append("")
+
+          if not changed_plugins and not removed_plugins:
+              lines.append("No meaningful lockfile changes detected.")
+          else:
+              if changed_plugins:
+                  for plugin, old_entry, new_entry in changed_plugins:
+                      new_commit = new_entry.get("commit", "")
+                      old_commit = old_entry.get("commit", "") if old_entry else None
+
+                      lines.append(f"### {plugin}")
+                      if old_entry is None:
+                          short_new = new_commit[:7] if new_commit else "unknown"
+                          lines.append(f"- added at `{short_new}`")
+                      else:
+                          short_old = old_commit[:7] if old_commit else "unknown"
+                          short_new = new_commit[:7] if new_commit else "unknown"
+                          lines.append(f"- `{short_old}` -> `{short_new}`")
+                      lines.append("")
+
+              if removed_plugins:
+                  lines.append("## removed")
+                  lines.append("")
+                  for plugin in sorted(removed_plugins):
+                      lines.append(f"- {plugin}")
+                  lines.append("")
+
+          Path("pr-body.md").write_text("\n".join(lines) + "\n")
+          PY
+
+      - name: Commit changes
+        if: steps.changes.outputs.changed == 'true' && github.event_name != 'pull_request'
+        run: |
+          git checkout -B chore/lazy-lock-update
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add neovim/lazy-lock.json pr-body.md
+          git commit -m "chore(neovim): update lazy-lock.json"
+
+      - name: Push branch
+        if: steps.changes.outputs.changed == 'true' && github.event_name != 'pull_request'
+        run: |
+          git push --force --set-upstream origin chore/lazy-lock-update
+
+      - name: Create or update pull request
+        if: steps.changes.outputs.changed == 'true' && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh pr view chore/lazy-lock-update >/dev/null 2>&1; then
+            gh pr edit chore/lazy-lock-update \
+              --title "chore(neovim): update lazy-lock.json" \
+              --body-file pr-body.md
+          else
+            gh pr create \
+              --head chore/lazy-lock-update \
+              --base "${{ github.event.repository.default_branch }}" \
+              --title "chore(neovim): update lazy-lock.json" \
+              --body-file pr-body.md
+          fi
+
+      - name: Show summary on pull requests
+        if: steps.changes.outputs.changed == 'true' && github.event_name == 'pull_request'
+        run: |
+          cat pr-body.md >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Lockfile changed during validation, but no branch push or PR was created because this run came from pull_request." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: No changes
+        if: steps.changes.outputs.changed != 'true'
+        run: |
+          echo "No neovim/lazy-lock.json changes detected."
