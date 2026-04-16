@@ -39,7 +39,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          token: ${{ secrets.PR_PAT }}
           fetch-depth: 0
 
       - name: Mark workspace as safe
@@ -139,13 +138,14 @@ jobs:
       - name: Push branch
         if: steps.changes.outputs.changed == 'true' && github.event_name != 'pull_request'
         run: |
-          git push --force --set-upstream origin chore/lazy-lock-update
 
       - name: Create or update pull request
         if: steps.changes.outputs.changed == 'true' && github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.PR_PAT }}
         run: |
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:chore/lazy-lock-update
+
           pr_number="$(gh pr list \
             --head chore/lazy-lock-update \
             --state open \
