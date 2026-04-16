@@ -37,8 +37,9 @@ jobs:
           pacman -S --noconfirm git github-cli neovim python
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
+          token: ${{ secrets.PR_PAT }}
           fetch-depth: 0
 
       - name: Mark workspace as safe
