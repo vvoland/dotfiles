@@ -161,6 +161,7 @@ jobs:
               --head chore/lazy-lock-update \
               --base "${{ github.event.repository.default_branch }}" \
               --title "chore(neovim): update lazy-lock.json" \
+              --reviewer vvoland \
               --body-file pr-body.md
           fi
 
