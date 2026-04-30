@@ -1,7 +1,19 @@
 ---
 shell:
   git_commit:
-    description: "Create a Git Commit with ONLY specified files. Use this to check-in atomic changes. Use this instead of executing git in shell tool."
+    description: |
+      Create a Git Commit with ONLY specified files.
+      Use this to check-in atomic changes.
+      Use this instead of executing git in shell tool.
+
+      Commit message is destined for future maintainers and must follow the following rules:
+
+      - Subject: "<component>: <reason-focused summary>"
+      - Use imperative mood.
+      - Explain why the change is needed, not just what changed.
+      - The body should capture motivation, constraints, and impact.
+      - Avoid narrating the diff line-by-line.
+      - Prefer concise, reviewable messages that remain useful months later.
     cmd: |
       set -xe
       git reset HEAD '*'
@@ -13,18 +25,14 @@ shell:
         description: "Files to add via git add (this will be argument to 'git add '"
       message:
         type: string
-        description: |
-          Commit message. Explain in high level, don't focus on implementation details.
-          Use imperative language like "fix" not "fixed".
-          Subject format be: "<component>: <description>"
-          Example: gha/ci: Add integration test workflow
-  git_fixup:
-    description: "Create a fixup commit with ONLY specified files for the target commit. Use this instead of executing git in shell tool."
+        description: "Full commit message"
+  git_absorb:
+    description: "Fixup previous commits with changes to the specified files. If the changes you made adjust a commit created in this session, prefer this rather than creating a new commit."
     cmd: |
       set -xe
       git reset HEAD '*'
       printf '%s\n' "$files" | xargs git add --
-      git commit -s -S --fixup "$ref"
+      git absorb
     args:
       files:
         type: string

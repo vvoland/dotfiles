@@ -13,7 +13,7 @@ shell:
       github_issue_url:
         type: string
   github_activity:
-    desription: "Show my latest Github activity"
+    description: "Show my latest Github activity"
     cmd: |
       gh api /users/vvoland/events?per_page=20 --jq '.[] |
       {
@@ -35,6 +35,13 @@ shell:
   github_pr_view:
     cmd: gh pr view "$github_pr_url" --json title,body,files,labels,url | yq -P
     description: "View Github PR metadata"
+    args:
+      github_pr_url:
+        type: string
+  github_pr_commits:
+    cmd: |
+      gh pr view "$github_pr_url" --json commits --jq '.commits.[] | {oid: .oid, messageBody: .messageBody}' | jq -s | yq -P
+    description: "Get commits added by Github PR"
     args:
       github_pr_url:
         type: string
