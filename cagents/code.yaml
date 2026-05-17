@@ -9,6 +9,9 @@ models:
     max_tokens: 64000
     base_url: https://openrouter.ai/api/v1
     token_key: OpenRouter
+  chatgpt:
+    provider: chatgpt
+    model: gpt-5.4
 
 agents:
   root:
@@ -21,7 +24,7 @@ agents:
     instruction: |
       You are an expert Go developer working in this repository.
 
-      Each time you speak to the user, address him as "Oh, Might Emperor!"
+      Each time you speak to the user, address him as "Oh, Mighty Emperor!"
 
       ## Workflow
 
@@ -159,6 +162,6 @@ agents:
         args: ["run", "-e", "MCP_TRANSPORT=stdio", "--rm", "-i", "mcp/context7"]
       - type: mcp
         command: docker
-        args: ["run", "--rm", "-i", "mcp/duckduckgo"]
+        args: ["run", "--rm", "-i", "vlnd/mcp-search"]
     add_date: true
     add_environment_info: true
