@@ -1,8 +1,12 @@
 * {
     color: #eee;
     font-family: 'Open Sans', SymbolsNerdFont;
-    font-size: 11pt;
-    text-shadow: 0 0 6px rgba(0, 0, 0, 0.8), 0 0 2px rgba(0, 0, 0, 0.95);
+    font-size: 18px;
+    text-shadow:
+        1px 0 0 rgba(0, 0, 0, 0.18),
+        -1px 0 0 rgba(0, 0, 0, 0.18),
+        0 1px 0 rgba(0, 0, 0, 0.18),
+        0 -1px 0 rgba(0, 0, 0, 0.18);
     font-weight: 700;
     background: transparent;
     border: 0;
@@ -40,10 +44,11 @@ tooltip {
     margin: 0 2px;
 }
 
-#temperature.critical {
-    color: #eceff4;
+.critical {
+    background: #cc3333;
 }
 
-#battery.charging {
-    color: #218121;
+.charging {
+    color: #11dd11;
+    background: transparent;
 }
