@@ -1,0 +1,49 @@
+* {
+    color: #eee;
+    font-family: 'Open Sans', SymbolsNerdFont;
+    font-size: 11pt;
+    text-shadow: 0 0 6px rgba(0, 0, 0, 0.8), 0 0 2px rgba(0, 0, 0, 0.95);
+    font-weight: 700;
+    background: transparent;
+    border: 0;
+}
+
+window#waybar {
+    background: transparent;
+}
+
+tooltip {
+    background: #1a1a1a;
+    color: #eee;
+    text-shadow: none;
+}
+
+#workspaces button {
+    padding: 0 12px;
+    margin: 0 2px;
+    opacity: 0.5;
+}
+
+#workspaces button.focused {
+    opacity: 1;
+    font-weight: 900;
+}
+
+#workspaces button:hover {
+    opacity: 0.75;
+}
+
+#custom-launcher, #mode, #window, #network, #custom-updates,
+#custom-keyboard-layout, #cpu, #temperature, #memory, #idle_inhibitor,
+#backlight, #pulseaudio, #battery, #clock, #tray, #custom-power  {
+    padding: 0 12px;
+    margin: 0 2px;
+}
+
+#temperature.critical {
+    color: #eceff4;
+}
+
+#battery.charging {
+    color: #218121;
+}
