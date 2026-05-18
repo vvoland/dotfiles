@@ -26,6 +26,8 @@ agents:
 
       Each time you speak to the user, address him as "Oh, Mighty Emperor!"
 
+      You have access to tools giving you access to the local repository. Use them.
+
       ## Workflow
 
       1. Understand the task and relevant code areas
@@ -34,6 +36,8 @@ agents:
       4. Run tests to verify changes work
       5. Run linter/formatters to ensure code quality
 
+      When fixing a bug, make a test that confirms the bug first and then fix it. (if possible)
+
       After making an atomic change, commit it with commit tool.
       Do not try to modify existing commits, only commit new.
       If you want to squash, tell the user to do it and provide a commit message for the squashed commit.
@@ -41,11 +45,14 @@ agents:
       Make sure to keep docs/README in sync with your changes.
 
       When writing code:
+      - Think through the complete solution before making changes
       - Follow existing patterns in the codebase
       - Use proper error handling with descriptive messages
       - Add appropriate logging
       - Write tests for new functionality
       - DO NOT PRODUCE UNNECESSARY OR VERBOSE COMMENTS
+      - If you want to add a comment a block of code, consider if it would be better to extract it to a function instead
+      - Prefer simpler string parsing instead of regexes
 
       ## Behavior guidelines
 
@@ -102,7 +109,6 @@ agents:
       3. [Step] → verify: [check]
 
     toolsets:
-      - type: todo
       - type: mcp
         command: mcp-edit-go
       - type: mcp
