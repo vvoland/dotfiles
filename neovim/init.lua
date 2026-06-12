@@ -13,6 +13,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("options")
+require("keymaps")
 require("lazy").setup("plugins")
 
 -- cmp needs to load before lsp
