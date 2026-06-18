@@ -24,6 +24,10 @@ background_opacity 0.9
 background_blur 64
 """
 
+dockpad = """
+font_size 13
+"""
+
 
 def main():
     h = hostname.lower()
@@ -31,8 +35,12 @@ def main():
         "windrider": windrider,
         "fqpf6ww46h": macbook,
         "macbookpro.lan": macbook,
+        "dockpad": dockpad,
     }
-    print(cfg[h])
+    try:
+        print(cfg[h])
+    except:
+        pass
 
 
 if __name__ == "__main__":
