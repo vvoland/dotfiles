@@ -13,7 +13,7 @@ function claude
   end
 
   set url "https://api.anthropic.com"
-  set model "claude-sonnet-4-20250514"
+  set model "claude-sonnet-4-6"
 
   set payload (jq -n \
     --arg model $model \
