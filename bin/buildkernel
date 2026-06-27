@@ -1,0 +1,170 @@
+#!/usr/bin/env bash
+# Fast local Fedora kernel build/install helper.
+# Run from the root of a configured kernel tree.
+set -euo pipefail
+
+usage() {
+	cat <<'EOF'
+Usage: ./buildkernel [options]
+
+Build the current kernel tree and, by default, install it directly without RPMs.
+
+Options:
+  -j, --jobs N          Parallel jobs. Default: nproc.
+      --no-install      Build only; do not install modules/kernel/initramfs.
+      --no-default      Do not set the installed kernel as GRUB default.
+      --no-dracut       Skip initramfs generation.
+      --sign            Run ./setup-key.sh sign after make install.
+      --kexec           Load the installed kernel with kexec after install.
+      --localversion S  Set CONFIG_LOCALVERSION to S before building.
+      --quick-config    Disable common expensive debug-info options.
+  -h, --help            Show this help.
+
+Environment:
+  KDIR                  Kernel tree. Default: current directory.
+  KCFLAGS               Extra compiler flags passed through to make.
+EOF
+}
+
+need() {
+	command -v "$1" >/dev/null || {
+		echo "missing tool: $1" >&2
+		exit 1
+	}
+}
+
+run_make() {
+	make -C "$KDIR" -j"$jobs" "$@"
+}
+
+jobs="$(nproc)"
+KDIR="${KDIR:-$(pwd)}"
+install=1
+set_default=1
+dracut=1
+sign=0
+kexec=0
+localversion=""
+quick_config=0
+
+while (($#)); do
+	case "$1" in
+		-j|--jobs)
+			[[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
+			jobs="$2"
+			shift 2
+			;;
+		--no-install)
+			install=0
+			shift
+			;;
+		--no-default)
+			set_default=0
+			shift
+			;;
+		--no-dracut)
+			dracut=0
+			shift
+			;;
+		--sign)
+			sign=1
+			shift
+			;;
+		--kexec)
+			kexec=1
+			shift
+			;;
+		--localversion)
+			[[ $# -ge 2 ]] || { echo "$1 requires a value" >&2; exit 1; }
+			localversion="$2"
+			shift 2
+			;;
+		--quick-config)
+			quick_config=1
+			shift
+			;;
+		-h|--help)
+			usage
+			exit 0
+			;;
+		*)
+			echo "unknown option: $1" >&2
+			usage >&2
+			exit 1
+			;;
+	esac
+done
+
+[[ -f "$KDIR/Makefile" && -d "$KDIR/scripts" ]] || {
+	echo "not a kernel tree: $KDIR" >&2
+	exit 1
+}
+
+if [[ ! -f "$KDIR/.config" ]]; then
+	if compgen -G "/boot/config-*" >/dev/null; then
+		latest_config="$(ls -1t /boot/config-* | head -n1)"
+		cp "$latest_config" "$KDIR/.config"
+		echo "seeded .config from $latest_config"
+	else
+		echo "missing $KDIR/.config and no /boot/config-* found" >&2
+		exit 1
+	fi
+fi
+
+if [[ -n "$localversion" || "$quick_config" -eq 1 ]]; then
+	[[ -x "$KDIR/scripts/config" ]] || { echo "missing scripts/config" >&2; exit 1; }
+	if [[ -n "$localversion" ]]; then
+		"$KDIR/scripts/config" --file "$KDIR/.config" --set-str LOCALVERSION "$localversion"
+	fi
+	if [[ "$quick_config" -eq 1 ]]; then
+		"$KDIR/scripts/config" --file "$KDIR/.config" \
+			--disable DEBUG_INFO \
+			--disable DEBUG_INFO_BTF \
+			--disable DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT
+	fi
+	make -C "$KDIR" olddefconfig
+fi
+
+kernelrelease="$(make -C "$KDIR" -s kernelrelease)"
+echo "building Linux $kernelrelease with $jobs jobs"
+run_make bzImage modules
+
+if [[ "$install" -eq 0 ]]; then
+	echo "build complete: $kernelrelease"
+	exit 0
+fi
+
+need sudo
+sudo make -C "$KDIR" modules_install
+sudo make -C "$KDIR" install
+
+kernelrelease="$(make -C "$KDIR" -s kernelrelease)"
+kernel_image="/boot/vmlinuz-$kernelrelease"
+initramfs="/boot/initramfs-$kernelrelease.img"
+
+if [[ "$sign" -eq 1 ]]; then
+	[[ -x "$KDIR/setup-key.sh" ]] || { echo "missing executable $KDIR/setup-key.sh" >&2; exit 1; }
+	"$KDIR/setup-key.sh" sign
+fi
+
+if [[ "$dracut" -eq 1 ]]; then
+	need dracut
+	sudo dracut --force "$initramfs" "$kernelrelease"
+fi
+
+if [[ "$set_default" -eq 1 ]]; then
+	need grubby
+	sudo grubby --set-default "$kernel_image"
+fi
+
+if [[ "$kexec" -eq 1 ]]; then
+	need kexec
+	[[ -f "$kernel_image" ]] || { echo "missing $kernel_image" >&2; exit 1; }
+	[[ -f "$initramfs" ]] || { echo "missing $initramfs" >&2; exit 1; }
+	sudo kexec -l "$kernel_image" --initrd="$initramfs" --reuse-cmdline
+	echo "loaded $kernelrelease with kexec; run: sudo systemctl kexec"
+fi
+
+echo "installed Linux $kernelrelease"
+echo "boot image: $kernel_image"
+[[ "$set_default" -eq 1 ]] && echo "set as default boot kernel"
