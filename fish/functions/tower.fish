@@ -3,12 +3,15 @@ function tower --argument action
         set action wake
     end
 
-    # might be useful to do:
-    # echo "$(whoami) ALL=(ALL) NOPASSWD: /usr/sbin/ether-wake" >>/etc/sudoers.d/10-etherwake
     set host archtower.lan
     set mac  00:D8:61:BC:57:14
 
-    sudo ether-wake "$mac"
+    if test "$action" = suspend
+        ssh "woland@$host" systemctl suspend
+        return
+    end
+
+    wol "$mac"
 
     if not ping -W 1 -c 1 $host >/dev/null 2>&1
         set -l frames '.' 'o' 'O'
