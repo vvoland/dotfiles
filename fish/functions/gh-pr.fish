@@ -32,8 +32,8 @@ function gh-pr
     # end
     set merge_base "$master...HEAD"
 
-    set body (git log --reverse --format='### %s%n%n%w(1000,2,2)%b%n' "upstream/$merge_base" -- | grep -v Signed-off | string collect)
-    set title (git log --reverse --format="%s" "upstream/$merge_base" -- | head -n1)
+    set body (git log --no-show-signature --reverse --format='### %s%n%n%w(1000,2,2)%b%n' "upstream/$merge_base" -- | grep -v Signed-off | string collect)
+    set title (git log --no-show-signature --reverse --format="%s" "upstream/$merge_base" -- | head -n1)
 
     gh pr create -B "$master" -w --head "vvoland:$branch" -R "$repo" --title "$title" -a "@me" --body "$body" $argv
 end
