@@ -7,7 +7,7 @@ function tower --argument action
     set mac  00:D8:61:BC:57:14
 
     if test "$action" = suspend
-        ssh "woland@$host" systemctl suspend
+        ssh -t "woland@$host" systemctl suspend
         return
     end
 
