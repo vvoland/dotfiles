@@ -22,19 +22,17 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: archlinux:latest
+      image: alpine:latest
 
     defaults:
       run:
-        shell: bash
+        shell: sh
         working-directory: ${{ github.workspace }}
 
     steps:
       - name: Install tools
         run: |
-          pacman -Sy --noconfirm archlinux-keyring
-          pacman -Syu --noconfirm
-          pacman -S --noconfirm git github-cli neovim python
+          apk add --no-cache git github-cli neovim python3
 
       - name: Checkout
         uses: actions/checkout@v6
@@ -74,7 +72,7 @@ jobs:
       - name: Generate PR body
         if: steps.changes.outputs.changed == 'true'
         run: |
-          python <<'PY'
+          python3 <<'PY'
           import json
           from pathlib import Path
 
