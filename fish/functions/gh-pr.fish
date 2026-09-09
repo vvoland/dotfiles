@@ -2,6 +2,7 @@ function gh-pr
     set branch (git rev-parse --abbrev-ref HEAD)
 
     set repo (gh-repo upstream)
+    or return 1
 
     echo "Repo: $repo"
     echo "Branch: $branch"

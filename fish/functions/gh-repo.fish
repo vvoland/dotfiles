@@ -1,7 +1,9 @@
 function gh-repo --argument remote
     if test -z "$remote"
-	set -l remote "origin"
+        set remote origin
     end
-    set -l repo (git remote -v | grep "$remote" | grep 'github.com' | cut -d ':' -f2 | cut -d ' ' -f1 | head -n1)
-    echo (string replace '.git' '' $repo)
+    set -l url (git remote get-url "$remote")
+    or return 1
+
+    gh repo view "$url" --json nameWithOwner --jq .nameWithOwner
 end
