@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+
+set -uo pipefail
+
+usage() {
+    echo "Usage: $(basename "$0") <GitHub PR URL>" >&2
+    echo "Example: $(basename "$0") https://github.com/moby/moby/pull/53602" >&2
+}
+
+if [[ $# -ne 1 ]]; then
+    usage
+    exit 2
+fi
+
+pr_url="${1%/}"
+
+if [[ ! "$pr_url" =~ ^https://github\.com/([^/]+)/([^/]+)/pull/[0-9]+$ ]]; then
+    echo "error: expected a URL like https://github.com/OWNER/REPO/pull/NUMBER" >&2
+    exit 2
+fi
+
+repo="${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
+
+if ! command -v gh >/dev/null 2>&1; then
+    echo "error: GitHub CLI (gh) is not installed" >&2
+    exit 1
+fi
+
+if ! gh auth status >/dev/null 2>&1; then
+    echo "error: GitHub CLI is not authenticated; run 'gh auth login'" >&2
+    exit 1
+fi
+
+if ! failed_links="$(
+    gh pr checks "$pr_url" \
+        --json bucket,link \
+        --jq '.[] | select(.bucket == "fail") | .link'
+)"; then
+    echo "error: could not retrieve checks for $pr_url" >&2
+    exit 1
+fi
+
+declare -A unique_run_ids=()
+unsupported_links=()
+
+while IFS= read -r link; do
+    [[ -z "$link" ]] && continue
+
+    if [[ "$link" =~ /actions/runs/([0-9]+) ]]; then
+        unique_run_ids["${BASH_REMATCH[1]}"]=1
+    else
+        unsupported_links+=("$link")
+    fi
+done <<<"$failed_links"
+
+run_ids=("${!unique_run_ids[@]}")
+
+if [[ ${#run_ids[@]} -eq 0 ]]; then
+    echo "No failed GitHub Actions checks found for $pr_url."
+
+    if [[ ${#unsupported_links[@]} -gt 0 ]]; then
+        echo "Failed checks without a GitHub Actions run URL:" >&2
+        printf '  %s\n' "${unsupported_links[@]}" >&2
+    fi
+
+    exit 0
+fi
+
+failures=0
+
+while IFS= read -r run_id; do
+    printf '\033[90mgh run rerun %q --failed --repo %q\033[0m\n' "$run_id" "$repo"
+
+    if ! gh run rerun "$run_id" --failed --repo "$repo"; then
+        echo "error: could not rerun failed jobs in run $run_id" >&2
+        ((failures += 1))
+    fi
+done < <(printf '%s\n' "${run_ids[@]}" | sort -n)
+
+if [[ ${#unsupported_links[@]} -gt 0 ]]; then
+    echo "Skipped failed checks without a GitHub Actions run URL:" >&2
+    printf '  %s\n' "${unsupported_links[@]}" >&2
+fi
+
+if ((failures > 0)); then
+    echo "Failed to restart $failures workflow run(s)." >&2
+    exit 1
+fi
+
+echo "Restarted failed jobs in ${#run_ids[@]} workflow run(s)."
