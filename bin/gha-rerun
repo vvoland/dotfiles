@@ -40,20 +40,28 @@ if ! failed_links="$(
     exit 1
 fi
 
-declare -A unique_run_ids=()
+run_ids=()
 unsupported_links=()
 
 while IFS= read -r link; do
     [[ -z "$link" ]] && continue
 
     if [[ "$link" =~ /actions/runs/([0-9]+) ]]; then
-        unique_run_ids["${BASH_REMATCH[1]}"]=1
+        run_id="${BASH_REMATCH[1]}"
+        seen=0
+        for existing_run_id in "${run_ids[@]}"; do
+            if [[ "$existing_run_id" == "$run_id" ]]; then
+                seen=1
+                break
+            fi
+        done
+        if (( seen == 0 )); then
+            run_ids+=("$run_id")
+        fi
     else
         unsupported_links+=("$link")
     fi
 done <<<"$failed_links"
-
-run_ids=("${!unique_run_ids[@]}")
 
 if [[ ${#run_ids[@]} -eq 0 ]]; then
     echo "No failed GitHub Actions checks found for $pr_url."
