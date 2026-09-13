@@ -20,3 +20,4 @@ require("lazy").setup("plugins")
 -- require("config/cmp")
 require("config/lsp")
 
+require("config/ai")
