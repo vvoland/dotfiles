@@ -1,6 +1,7 @@
 -- Manually triggered inline (ghost text) completion from the OpenAI API.
 -- <C-l> in insert mode requests a suggestion, then accepts it; :AI requests one
--- from anywhere. Moving, typing, or leaving insert throws it away.
+-- from anywhere. Moving, typing, or leaving insert throws it away. The response
+-- streams, so accepting mid-flight takes whatever has arrived.
 
 local M = {}
 
@@ -91,27 +92,48 @@ local function context(buf, row, col)
   return prefix:sub(-prefix_chars), suffix:sub(1, suffix_chars)
 end
 
--- Returns the text to insert, or nil plus a reason fit to show the user.
-local function completion(out)
-  if out.stdout == "" then
-    return nil, "curl: " .. (out.stderr ~= "" and out.stderr or "exit " .. out.code)
-  end
+-- Consumes one chunk of the SSE stream, appending any content deltas to
+-- state.text. Chunks split mid-frame, so the trailing partial line is held over
+-- in state.raw. Anything that is not a frame is an error body; keep it for
+-- state.other. Returns true if the text grew.
+local function consume(state, chunk)
+  state.raw = state.raw .. chunk
+  local lines = vim.split(state.raw, "\n")
+  state.raw = table.remove(lines)
 
-  local ok, res = pcall(vim.json.decode, out.stdout)
-  if not ok then
-    return nil, out.stdout
+  local grew = false
+  for _, line in ipairs(lines) do
+    local payload = line:match("^data: (.+)$")
+    if not payload then
+      state.other = state.other .. line
+    elseif payload ~= "[DONE]" then
+      local ok, frame = pcall(vim.json.decode, payload)
+      local delta = ok and vim.tbl_get(frame, "choices", 1, "delta", "content")
+      if delta and delta ~= "" then
+        state.text = state.text .. delta
+        grew = true
+      end
+    end
   end
-  if res.error then
-    return nil, res.error.message or out.stdout -- not every error shape has one
-  end
-  if not (res.choices and res.choices[1]) then
-    return nil, out.stdout
-  end
+  return grew
+end
 
-  -- The model is told not to fence its answer, but sometimes does anyway.
-  local text = res.choices[1].message.content
-  text = text:gsub("^```%w*\n", ""):gsub("\n?```%s*$", "")
-  return text
+-- The model is told not to fence its answer, but sometimes does anyway. The
+-- closing fence only shows up once the stream ends.
+local function unfence(text)
+  return text:gsub("^```%w*\n", ""):gsub("\n?```%s*$", "")
+end
+
+local function error_text(state, out)
+  local raw = vim.trim(state.other .. state.raw)
+  local ok, res = pcall(vim.json.decode, raw)
+  if ok and type(res) == "table" and res.error then
+    return res.error.message or raw
+  end
+  if raw ~= "" then
+    return raw
+  end
+  return out.stderr ~= "" and out.stderr or "empty completion"
 end
 
 function M.accept()
@@ -140,13 +162,14 @@ function M.request()
   local row, col = unpack(vim.api.nvim_win_get_cursor(0))
   local prefix, suffix = context(buf, row, col)
 
-  local state = { buf = buf, row = row - 1, col = col }
+  local state = { buf = buf, row = row - 1, col = col, raw = "", other = "", text = "" }
   active = state
   render(state, { "…" })
 
   local body = vim.json.encode({
     model = model,
     reasoning_effort = reasoning_effort,
+    stream = true,
     messages = {
       { role = "system", content = prompt },
       {
@@ -158,7 +181,7 @@ function M.request()
 
   local config = auth_file(token)
   local cmd = {
-    "curl", "-sS",
+    "curl", "-sS", "-N", -- -N: hand us each frame as it lands, do not buffer
     "--max-time", tostring(timeout),
     "--connect-timeout", "5",
     "-K", config,
@@ -169,26 +192,40 @@ function M.request()
     "-d", body,
   }
 
-  state.job = vim.system(cmd, { text = true }, function(out)
+  local opts = {
+    text = true,
+    -- Runs in a fast event context: parse here, touch the buffer on the main
+    -- loop. Renders are coalesced so a burst of deltas costs one redraw.
+    stdout = function(_, chunk)
+      if not chunk or not consume(state, chunk) or state.drawing then
+        return
+      end
+      state.drawing = true
+      vim.schedule(function()
+        state.drawing = false
+        if active ~= state then
+          return
+        end
+        state.lines = vim.split(unfence(state.text), "\n")
+        render(state, state.lines)
+      end)
+    end,
+  }
+
+  state.job = vim.system(cmd, opts, function(out)
     os.remove(config) -- before the staleness check: a killed job cleans up too
     vim.schedule(function()
       if active ~= state then
         return
       end
       state.job = nil
-
-      local text, err = completion(out)
-      if not text then
-        clear()
-        return vim.notify("openai: " .. (err or "no response"), vim.log.levels.ERROR)
-      end
-      if text == "" then
-        clear()
-        return vim.notify("openai: empty completion", vim.log.levels.WARN)
+      if state.lines then
+        return -- already on screen, drawn as it arrived
       end
 
-      state.lines = vim.split(text, "\n")
-      render(state, state.lines)
+      local err = error_text(state, out)
+      clear()
+      vim.notify("openai: " .. err, vim.log.levels.ERROR)
     end)
   end)
 end
