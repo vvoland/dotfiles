@@ -21,3 +21,5 @@ require("lazy").setup("plugins")
 require("config/lsp")
 
 require("config/ai")
+
+require("paw").setup()
