@@ -49,7 +49,8 @@ while IFS= read -r link; do
     if [[ "$link" =~ /actions/runs/([0-9]+) ]]; then
         run_id="${BASH_REMATCH[1]}"
         seen=0
-        for existing_run_id in "${run_ids[@]}"; do
+        # Bash 3.2 treats empty arrays as unset under nounset.
+        for existing_run_id in ${run_ids[@]+"${run_ids[@]}"}; do
             if [[ "$existing_run_id" == "$run_id" ]]; then
                 seen=1
                 break
@@ -63,10 +64,10 @@ while IFS= read -r link; do
     fi
 done <<<"$failed_links"
 
-if [[ ${#run_ids[@]} -eq 0 ]]; then
+if [[ -z "${run_ids[*]-}" ]]; then
     echo "No failed GitHub Actions checks found for $pr_url."
 
-    if [[ ${#unsupported_links[@]} -gt 0 ]]; then
+    if [[ -n "${unsupported_links[*]-}" ]]; then
         echo "Failed checks without a GitHub Actions run URL:" >&2
         printf '  %s\n' "${unsupported_links[@]}" >&2
     fi
@@ -85,7 +86,7 @@ while IFS= read -r run_id; do
     fi
 done < <(printf '%s\n' "${run_ids[@]}" | sort -n)
 
-if [[ ${#unsupported_links[@]} -gt 0 ]]; then
+if [[ -n "${unsupported_links[*]-}" ]]; then
     echo "Skipped failed checks without a GitHub Actions run URL:" >&2
     printf '  %s\n' "${unsupported_links[@]}" >&2
 fi
