@@ -24,3 +24,4 @@ require("config/ai")
 
 require("paw").setup()
 require("ghlines").setup()
+require("diff").setup()
