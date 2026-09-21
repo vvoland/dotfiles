@@ -1,5 +1,24 @@
 # Neovim config
 
+## GitHub Actions links
+
+In YAML buffers, press `gx` on a `uses: owner/repo@ref` reference to open it
+on GitHub. A version-only comment selects a release; otherwise the link
+opens the commit, tag, or branch. Subdirectories and reusable workflows work too.
+
+```yaml
+uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+```
+
+This opens the `v4.6.0` release, which must exist under that exact tag.
+References are also terminal hyperlinks (OSC 8): **Ctrl+Shift-click** in
+Kitty, even with Neovim's mouse mode disabled. Links update as you edit;
+other links keep normal `gx` behavior.
+
+Requires Neovim 0.10+; terminal hyperlinks also require OSC 8 support.
+Implemented by the local [ghactions.nvim plugin](lua/plugins/ghactions),
+loaded by lazy.nvim for YAML buffers.
+
 ## `:Diff [revision]`
 
 Compare a revision (default `HEAD~1`) against the working tree, with editable
