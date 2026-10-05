@@ -33,6 +33,11 @@ tooltip {
     opacity: 0.75;
 }
 
+#workspaces button.urgent {
+    color: #efbc56;
+    opacity: 1;
+}
+
 #custom-launcher, #mode, #window, #network, #custom-updates,
 #custom-keyboard-layout, #cpu, #temperature, #memory, #idle_inhibitor,
 #backlight, #pulseaudio, #battery, #clock, #tray, #custom-power  {
