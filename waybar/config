@@ -52,11 +52,11 @@
     },
     "cpu": {
         "format": "{usage: >3}%",
-        "on-click": "gnome-terminal -- fish -i -c htop"
+        "on-click": "kitty fish -i -c htop"
     },
     "cpu#freq": {
         "format": " {min_frequency}/{max_frequency}GHz",
-        "on-click": "gnome-terminal -- fish -i -c htop",
+        "on-click": "kitty fish -i -c htop",
         "interval": 5
     },
     "temperature": {
@@ -67,7 +67,7 @@
     },
     "memory": {
         "format": "{: >3}%",
-        "on-click": "gnome-terminal -- fish -i -c htop"
+        "on-click": "kitty fish -i -c htop"
     },
     "backlight": {
         "format": "{icon} {percent: >3}%",
