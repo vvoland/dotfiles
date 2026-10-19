@@ -4,6 +4,6 @@ return {
   lazy = false,
   build = ":TSUpdate",
   config = function()
-    require("nvim-treesitter").install({ "pascal" })
+    require("nvim-treesitter").install({ "pascal", "nix" })
   end,
 }
