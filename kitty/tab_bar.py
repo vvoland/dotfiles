@@ -40,7 +40,7 @@ def _colored_tab(tab):
 
 
 
-_BRANCH_COLOR = 0x73DACA
+_BRANCH_COLOR = 0xBB9AF7
 _STATUS_COLORS = {
     "⬆": 0x7AA2F7,
     "⬇": 0x7AA2F7,
