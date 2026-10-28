@@ -5,7 +5,7 @@ hostname = socket.gethostname()
 
 windrider = """
 font_size 14
-font_family      family="Adwaita Mono"
+font_family      family="IBM Plex Mono"
 
 bold_font        auto
 italic_font      auto
@@ -30,6 +30,7 @@ def main():
     h = hostname.lower()
     cfg = {
         "windrider": windrider,
+        "windsuse": windrider,
         "fqpf6ww46h": macbook,
         "macbookpro.lan": macbook,
         "dockpad": dockpad,
