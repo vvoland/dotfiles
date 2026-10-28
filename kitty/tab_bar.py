@@ -3,10 +3,27 @@
 import re
 import subprocess
 from concurrent.futures import ThreadPoolExecutor
+from copy import copy
+from random import Random
 
 from kitty.fast_data_types import add_timer, get_boss, wcswidth
 from kitty.tab_bar import as_rgb, draw_tab_with_powerline
 from kitty.utils import color_as_int
+
+
+_TAB_BACKGROUNDS = (0x354A70, 0x59416B, 0x356052, 0x705038, 0x683E50, 0x3B5865)
+
+
+def _colored_tab(tab):
+    if tab.is_active:
+        return tab
+    # Seed by identity so titles, tab order, and redraws do not change the color.
+    return tab._replace(
+        inactive_bg=Random(tab.tab_id).choice(_TAB_BACKGROUNDS),
+        inactive_fg=0xFFFFFF,
+    )
+
+
 
 
 _BRANCH_COLOR = 0x73DACA
@@ -125,6 +142,12 @@ def draw_tab(draw_data, screen, tab, before, max_title_length, index, is_last, e
     if _timer is None:
         _timer = add_timer(_refresh, 1.0, True)
         _refresh(None)
+    tab = _colored_tab(tab)
+    extra_data = copy(extra_data)
+    if extra_data.next_tab is not None:
+        extra_data.next_tab = _colored_tab(extra_data.next_tab)
+    screen.cursor.fg = as_rgb(draw_data.tab_fg(tab))
+    screen.cursor.bg = as_rgb(draw_data.tab_bg(tab))
     end = draw_tab_with_powerline(
         draw_data, screen, tab, before, max_title_length, index, is_last, extra_data
     )
