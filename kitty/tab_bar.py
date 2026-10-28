@@ -40,16 +40,11 @@ def _colored_tab(tab):
             int(((background >> shift) & 0xFF) * 0.6) << shift
             for shift in (16, 8, 0)
         )
-    brightness = sum(
-        ((background >> shift) & 0xFF) * weight
-        for shift, weight in ((16, 299), (8, 587), (0, 114))
-    ) / 1000
-    foreground = 0x000000 if brightness > 130 else 0xFFFFFF
     if tab.is_active:
-        return tab._replace(active_bg=background, active_fg=foreground)
+        return tab._replace(active_bg=background, active_fg=0xFFFFFF)
     return tab._replace(
         inactive_bg=background,
-        inactive_fg=foreground,
+        inactive_fg=0xFFFFFF,
     )
 
 
