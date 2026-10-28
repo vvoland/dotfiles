@@ -20,12 +20,28 @@ d81b60 c2185b ad1457 880e4f c51162 ab47bc 9c27b0 8e24aa 7b1fa2 6a1b9a 4a148c aa0
 006064 00796b 00695c 004d40 827717 bf360c dd2c00 8d6e63 795548 6d4c41 5d4037 4e342e
 3e2723 757575 616161 424242 212121 546e7a 455a64 37474f 263238
 """.split())
+_tab_backgrounds = {}
 
 
 def _colored_tab(tab):
     if tab.is_active:
-        # Seed by identity so titles, tab order, and redraws do not change the color.
-        background = Random(tab.tab_id).choice(_TAB_BACKGROUNDS)
+        if tab.tab_id not in _tab_backgrounds:
+            boss = get_boss()
+            for tab_id in tuple(_tab_backgrounds):
+                if boss.tab_for_id(tab_id) is None:
+                    del _tab_backgrounds[tab_id]
+            used = set(_tab_backgrounds.values())
+            available = [color for color in _TAB_BACKGROUNDS if color not in used]
+            random = Random(tab.tab_id)
+            if available:
+                background = random.choice(available)
+            else:
+                # Keep white text readable even after the palette is exhausted.
+                background = random.choice(_TAB_BACKGROUNDS)
+                while background in used:
+                    background = sum(random.randrange(112) << shift for shift in (16, 8, 0))
+            _tab_backgrounds[tab.tab_id] = background
+        background = _tab_backgrounds[tab.tab_id]
         return tab._replace(active_bg=background, active_fg=0xFFFFFF)
     return tab._replace(
         inactive_bg=0x303030,
