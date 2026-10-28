@@ -23,17 +23,12 @@ d81b60 c2185b ad1457 880e4f c51162 ab47bc 9c27b0 8e24aa 7b1fa2 6a1b9a 4a148c aa0
 
 
 def _colored_tab(tab):
-    # Seed by identity so titles, tab order, and redraws do not change the color.
-    background = Random(tab.tab_id).choice(_TAB_BACKGROUNDS)
-    if not tab.is_active:
-        background = sum(
-            int(((background >> shift) & 0xFF) * 0.6) << shift
-            for shift in (16, 8, 0)
-        )
     if tab.is_active:
+        # Seed by identity so titles, tab order, and redraws do not change the color.
+        background = Random(tab.tab_id).choice(_TAB_BACKGROUNDS)
         return tab._replace(active_bg=background, active_fg=0xFFFFFF)
     return tab._replace(
-        inactive_bg=background,
+        inactive_bg=0x303030,
         inactive_fg=0xFFFFFF,
     )
 
