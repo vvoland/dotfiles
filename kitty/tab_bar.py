@@ -5,45 +5,30 @@ import re
 import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from copy import copy
-from random import Random
+from random import shuffle
 
 from kitty.fast_data_types import add_timer, get_boss, wcswidth
 from kitty.tab_bar import as_rgb, draw_tab_with_powerline
 from kitty.utils import color_as_int
 
 
-# Fish prompt colors with at least 4.5:1 contrast against white text.
-_TAB_BACKGROUNDS = tuple(int(color, 16) for color in """
-d81b60 c2185b ad1457 880e4f c51162 ab47bc 9c27b0 8e24aa 7b1fa2 6a1b9a 4a148c aa00ff
-7e57c2 673ab7 5e35b1 512da8 4527a0 311b92 7c4dff 651fff 6200ea 5c6bc0 3f51b5 3949ab
-303f9f 283593 1a237e 3d5afe 304ffe 1976d2 1565c0 0d47a1 2962ff 0277bd 01579b 00838f
-006064 00796b 00695c 004d40 827717 bf360c dd2c00 8d6e63 795548 6d4c41 5d4037 4e342e
-3e2723 757575 616161 424242 212121 546e7a 455a64 37474f 263238
-""".split())
-_tab_backgrounds = {}
+# Rainbow shades with at least 4.5:1 contrast against white text.
+_TAB_BACKGROUNDS = (0xC62828, 0xBF360C, 0x8A6800, 0x2E7D32, 0x1565C0)
+_tab_backgrounds = []
 
 
-def _colored_tab(tab):
+def _colored_tab(tab, index):
     if not tab.is_active:
         return tab._replace(inactive_bg=0x303030, inactive_fg=0xFFFFFF)
 
-    if tab.tab_id not in _tab_backgrounds:
-        boss = get_boss()
-        for tab_id in tuple(_tab_backgrounds):
-            if boss.tab_for_id(tab_id) is None:
-                del _tab_backgrounds[tab_id]
-        used = set(_tab_backgrounds.values())
-        available = [color for color in _TAB_BACKGROUNDS if color not in used]
-        random = Random(tab.tab_id)
-        if available:
-            background = random.choice(available)
-        else:
-            # Keep white text readable even after the palette is exhausted.
-            background = random.choice(_TAB_BACKGROUNDS)
-            while background in used:
-                background = sum(random.randrange(112) << shift for shift in (16, 8, 0))
-        _tab_backgrounds[tab.tab_id] = background
-    return tab._replace(active_bg=_tab_backgrounds[tab.tab_id], active_fg=0xFFFFFF)
+    # Assign by position so closing or moving tabs cannot create equal neighbors.
+    while len(_tab_backgrounds) < index:
+        colors = list(_TAB_BACKGROUNDS)
+        shuffle(colors)
+        if _tab_backgrounds and colors[0] == _tab_backgrounds[-1]:
+            colors[0], colors[1] = colors[1], colors[0]
+        _tab_backgrounds.extend(colors)
+    return tab._replace(active_bg=_tab_backgrounds[index - 1], active_fg=0xFFFFFF)
 
 
 
@@ -175,11 +160,11 @@ def draw_tab(draw_data, screen, tab, before, max_title_length, index, is_last, e
     if _timer is None:
         _timer = add_timer(_refresh, 1.0, True)
         _refresh(None)
-    tab = _colored_tab(tab)
+    tab = _colored_tab(tab, index)
     # Powerline uses the next tab's background for the separator color.
     extra_data = copy(extra_data)
     if extra_data.next_tab is not None:
-        extra_data.next_tab = _colored_tab(extra_data.next_tab)
+        extra_data.next_tab = _colored_tab(extra_data.next_tab, index + 1)
     screen.cursor.fg = as_rgb(draw_data.tab_fg(tab))
     screen.cursor.bg = as_rgb(draw_data.tab_bg(tab))
     end = draw_tab_with_powerline(
