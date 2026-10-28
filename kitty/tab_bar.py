@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Powerline tabs with background Git status for the focused pane."""
 
 import re
