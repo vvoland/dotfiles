@@ -24,29 +24,26 @@ _tab_backgrounds = {}
 
 
 def _colored_tab(tab):
-    if tab.is_active:
-        if tab.tab_id not in _tab_backgrounds:
-            boss = get_boss()
-            for tab_id in tuple(_tab_backgrounds):
-                if boss.tab_for_id(tab_id) is None:
-                    del _tab_backgrounds[tab_id]
-            used = set(_tab_backgrounds.values())
-            available = [color for color in _TAB_BACKGROUNDS if color not in used]
-            random = Random(tab.tab_id)
-            if available:
-                background = random.choice(available)
-            else:
-                # Keep white text readable even after the palette is exhausted.
-                background = random.choice(_TAB_BACKGROUNDS)
-                while background in used:
-                    background = sum(random.randrange(112) << shift for shift in (16, 8, 0))
-            _tab_backgrounds[tab.tab_id] = background
-        background = _tab_backgrounds[tab.tab_id]
-        return tab._replace(active_bg=background, active_fg=0xFFFFFF)
-    return tab._replace(
-        inactive_bg=0x303030,
-        inactive_fg=0xFFFFFF,
-    )
+    if not tab.is_active:
+        return tab._replace(inactive_bg=0x303030, inactive_fg=0xFFFFFF)
+
+    if tab.tab_id not in _tab_backgrounds:
+        boss = get_boss()
+        for tab_id in tuple(_tab_backgrounds):
+            if boss.tab_for_id(tab_id) is None:
+                del _tab_backgrounds[tab_id]
+        used = set(_tab_backgrounds.values())
+        available = [color for color in _TAB_BACKGROUNDS if color not in used]
+        random = Random(tab.tab_id)
+        if available:
+            background = random.choice(available)
+        else:
+            # Keep white text readable even after the palette is exhausted.
+            background = random.choice(_TAB_BACKGROUNDS)
+            while background in used:
+                background = sum(random.randrange(112) << shift for shift in (16, 8, 0))
+        _tab_backgrounds[tab.tab_id] = background
+    return tab._replace(active_bg=_tab_backgrounds[tab.tab_id], active_fg=0xFFFFFF)
 
 
 
@@ -63,13 +60,22 @@ _STATUS_COLORS = {
     "═": 0xF7768E,
     "◼": 0xA0A0A0,
 }
+# Match the status symbols and XY patterns in fish_right_prompt.fish.
+_STATUS_PATTERNS = (
+    ("✚", r"[ACDMT][ MT]|[ACMT]D"),
+    ("✖", r"[ ACMRT]D"),
+    ("✱", r"[MT]$"),
+    ("➜", r"R"),
+    ("═", r"AA|DD|U"),
+)
 
 
 
 
 def _parse_status(output):
     branch = oid = ""
-    ahead = behind = stashed = untracked = False
+    ahead = behind = 0
+    stashed = untracked = False
     states = set()
     entries = iter(output.split(b"\0"))
     for entry in entries:
@@ -84,6 +90,7 @@ def _parse_status(output):
         elif entry.startswith(b"? "):
             untracked = True
         elif entry.startswith((b"1 ", b"2 ", b"u ")):
+            # Porcelain v2 uses dots where the prompt's XY patterns expect spaces.
             states.add(entry[2:4].decode("ascii").replace(".", " "))
             if entry.startswith(b"2 "):
                 # Renames have a second NUL-delimited record for the old path.
@@ -98,10 +105,7 @@ def _parse_status(output):
     for symbol, present in (("⬆", ahead), ("⬇", behind), ("✭", stashed)):
         if present:
             parts.append(symbol)
-    # Match the status symbols and XY patterns in fish_right_prompt.fish.
-    for symbol, pattern in (("✚", r"[ACDMT][ MT]|[ACMT]D"),
-                            ("✖", r"[ ACMRT]D"), ("✱", r"[MT]$"),
-                            ("➜", r"R"), ("═", r"AA|DD|U")):
+    for symbol, pattern in _STATUS_PATTERNS:
         if any(re.search(pattern, state) for state in states):
             parts.append(symbol)
     if untracked:
@@ -112,9 +116,11 @@ def _parse_status(output):
 def _read_status(cwd):
     try:
         result = subprocess.run(
-            ["git", "--no-optional-locks", "-C", cwd, "status",
-             "--porcelain=v2", "--branch", "--show-stash", "-z",
-             "--untracked-files=normal"],
+            [
+                "git", "--no-optional-locks", "-C", cwd, "status",
+                "--porcelain=v2", "--branch", "--show-stash", "-z",
+                "--untracked-files=normal",
+            ],
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
             timeout=2,
@@ -125,34 +131,36 @@ def _read_status(cwd):
     return _parse_status(result.stdout) if result.returncode == 0 else ""
 
 
+# Keep Git subprocess waits off Kitty's UI thread.
 _executor = ThreadPoolExecutor(max_workers=1)
-_future = None
-_future_cwd = None
-_current = (None, None)
+_status_future = None
+_status_cwd = None
+_active_context = (None, None)
 _status = ""
 _timer = None
 
 
 def _refresh(timer_id):
-    global _future, _future_cwd, _current, _status
+    global _status_future, _status_cwd, _active_context, _status
 
     boss = get_boss()
     tab = boss.active_tab
     cwd = tab.get_cwd_of_active_window() if tab else None
     current = (tab.id if tab else None, cwd)
-    previous = _current
+    previous = _active_context
     old_status = _status
-    if current != _current:
-        _current = current
+    if current != _active_context:
+        _active_context = current
         _status = ""
 
-    if _future is not None and _future.done():
-        if _future_cwd == cwd:
-            _status = _future.result()
-        _future = None
-    if cwd and _future is None:
-        _future_cwd = cwd
-        _future = _executor.submit(_read_status, cwd)
+    if _status_future is not None and _status_future.done():
+        # Focus may have moved to a different directory while Git was running.
+        if _status_cwd == cwd:
+            _status = _status_future.result()
+        _status_future = None
+    if cwd and _status_future is None:
+        _status_cwd = cwd
+        _status_future = _executor.submit(_read_status, cwd)
 
     if previous != current or old_status != _status:
         for tab_id in {previous[0], current[0]} - {None}:
@@ -168,6 +176,7 @@ def draw_tab(draw_data, screen, tab, before, max_title_length, index, is_last, e
         _timer = add_timer(_refresh, 1.0, True)
         _refresh(None)
     tab = _colored_tab(tab)
+    # Powerline uses the next tab's background for the separator color.
     extra_data = copy(extra_data)
     if extra_data.next_tab is not None:
         extra_data.next_tab = _colored_tab(extra_data.next_tab)
@@ -179,8 +188,10 @@ def draw_tab(draw_data, screen, tab, before, max_title_length, index, is_last, e
     boss = get_boss()
     active_tab = boss.active_tab
     rendered_tab = boss.tab_for_id(tab.tab_id)
-    if (is_last and _status and active_tab and rendered_tab
-            and rendered_tab.os_window_id == active_tab.os_window_id):
+    if (
+        is_last and _status and active_tab and rendered_tab
+        and rendered_tab.os_window_id == active_tab.os_window_id
+    ):
         text = f" {_status} "
         width = wcswidth(text)
         if width < screen.columns - end:
