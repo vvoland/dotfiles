@@ -9,6 +9,22 @@ from kitty.tab_bar import as_rgb, draw_tab_with_powerline
 from kitty.utils import color_as_int
 
 
+_BRANCH_COLOR = 0x73DACA
+_STATUS_COLORS = {
+    "⬆": 0x7AA2F7,
+    "⬇": 0x7AA2F7,
+    "✭": 0xBB9AF7,
+    "✚": 0x9ECE6A,
+    "✖": 0xF7768E,
+    "✱": 0xE0AF68,
+    "➜": 0x7AA2F7,
+    "═": 0xF7768E,
+    "◼": 0xA0A0A0,
+}
+
+
+
+
 def _parse_status(output):
     branch = oid = ""
     ahead = behind = stashed = untracked = False
@@ -122,9 +138,14 @@ def draw_tab(draw_data, screen, tab, before, max_title_length, index, is_last, e
         if width < screen.columns - end:
             fg, bg = screen.cursor.fg, screen.cursor.bg
             screen.cursor.x = screen.columns - width
-            screen.cursor.fg = as_rgb(color_as_int(draw_data.active_fg))
             screen.cursor.bg = as_rgb(color_as_int(draw_data.default_bg))
-            screen.draw(text)
+            branch, *symbols = _status.split(" ")
+            screen.cursor.fg = as_rgb(_BRANCH_COLOR)
+            screen.draw(f" {branch}")
+            for symbol in symbols:
+                screen.cursor.fg = as_rgb(_STATUS_COLORS[symbol])
+                screen.draw(f" {symbol}")
+            screen.draw(" ")
             screen.cursor.fg, screen.cursor.bg = fg, bg
     # Keep the status outside tab hitboxes so blank-space double-click still works.
     return end
