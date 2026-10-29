@@ -12,14 +12,33 @@ from kitty.tab_bar import as_rgb, draw_tab_with_powerline
 from kitty.utils import color_as_int
 
 
-# Rainbow shades with at least 4.5:1 contrast against white text.
-_TAB_BACKGROUNDS = (0xC62828, 0xBF360C, 0x8A6800, 0x2E7D32, 0x1565C0)
+_TAB_BACKGROUNDS = (
+    0x38605B,
+    0xBF360C,
+    0x8A6800,
+    0x2E7D32,
+    0x1565C0,
+    0x1565C0,
+    0x3D7556,
+    0x345586,
+    0x465E64,
+    0x6B5935,
+    0x7C4B3D,
+    0x75465B,
+    0x495B3D,
+    0x305F70,
+)
+_ACTIVE_FOREGROUND = 0xFFFFFF
+_INACTIVE_BACKGROUND = 0x303030
+_INACTIVE_FOREGROUND = 0xFFFFFF
 _tab_backgrounds = []
 
 
 def _colored_tab(tab, index):
     if not tab.is_active:
-        return tab._replace(inactive_bg=0x303030, inactive_fg=0xFFFFFF)
+        return tab._replace(
+            inactive_bg=_INACTIVE_BACKGROUND, inactive_fg=_INACTIVE_FOREGROUND
+        )
 
     # Assign by position so closing or moving tabs cannot create equal neighbors.
     while len(_tab_backgrounds) < index:
@@ -28,7 +47,9 @@ def _colored_tab(tab, index):
         if _tab_backgrounds and colors[0] == _tab_backgrounds[-1]:
             colors[0], colors[1] = colors[1], colors[0]
         _tab_backgrounds.extend(colors)
-    return tab._replace(active_bg=_tab_backgrounds[index - 1], active_fg=0xFFFFFF)
+    return tab._replace(
+        active_bg=_tab_backgrounds[index - 1], active_fg=_ACTIVE_FOREGROUND
+    )
 
 
 
