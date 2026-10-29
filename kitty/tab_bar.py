@@ -120,6 +120,7 @@ def _parse_status(output):
 
 
 def _read_status(cwd):
+    """Return the status text, "" outside a repo, or None if Git did not finish."""
     try:
         result = subprocess.run(
             [
@@ -133,7 +134,7 @@ def _read_status(cwd):
             check=False,
         )
     except (OSError, subprocess.TimeoutExpired):
-        return ""
+        return None
     return _parse_status(result.stdout) if result.returncode == 0 else ""
 
 
@@ -151,18 +152,21 @@ def _refresh(timer_id):
 
     boss = get_boss()
     tab = boss.active_tab
-    cwd = tab.get_cwd_of_active_window() if tab else None
+    # The newest foreground process may be a prompt's git, which runs from the
+    # repo root; the oldest is the shell or the job the user started.
+    cwd = tab.get_cwd_of_active_window(oldest=True) if tab else None
     current = (tab.id if tab else None, cwd)
     previous = _active_context
     old_status = _status
-    if current != _active_context:
-        _active_context = current
+    if current[0] != _active_context[0]:
         _status = ""
+    _active_context = current
 
     if _status_future is not None and _status_future.done():
         # Focus may have moved to a different directory while Git was running.
-        if _status_cwd == cwd:
-            _status = _status_future.result()
+        status = _status_future.result()
+        if _status_cwd == cwd and status is not None:
+            _status = status
         _status_future = None
     if cwd and _status_future is None:
         _status_cwd = cwd
