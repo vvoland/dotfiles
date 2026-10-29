@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Powerline tabs with background Git status for the focused pane."""
 
+import os
 import re
 import subprocess
 from concurrent.futures import ThreadPoolExecutor
@@ -143,8 +144,22 @@ _executor = ThreadPoolExecutor(max_workers=1)
 _status_future = None
 _status_cwd = None
 _active_context = (None, None)
+_fish_cwds = {}
 _status = ""
 _timer = None
+
+
+def _fish_cwd(window):
+    """Return the cwd of the window's fish shell, remembered while it runs a job."""
+    # Prompt commands such as git share the shell's process group, so match
+    # fish by name; login shells have a leading "-" in argv[0].
+    for process in sorted(window.child.foreground_processes, key=lambda p: p["pid"]):
+        cmdline = process["cmdline"]
+        if cmdline and os.path.basename(cmdline[0]).lstrip("-") == "fish":
+            if process["cwd"]:
+                _fish_cwds[window.id] = process["cwd"]
+            break
+    return _fish_cwds.get(window.id)
 
 
 def _refresh(timer_id):
@@ -152,9 +167,8 @@ def _refresh(timer_id):
 
     boss = get_boss()
     tab = boss.active_tab
-    # The newest foreground process may be a prompt's git, which runs from the
-    # repo root; the oldest is the shell or the job the user started.
-    cwd = tab.get_cwd_of_active_window(oldest=True) if tab else None
+    window = tab.active_window if tab else None
+    cwd = _fish_cwd(window) if window else None
     current = (tab.id if tab else None, cwd)
     previous = _active_context
     old_status = _status
