@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Powerline tabs with the foreground PID and Git status for the focused pane."""
+"""Powerline tabs with background Git status for the focused pane."""
 
 import os
 import re
@@ -144,7 +144,6 @@ _executor = ThreadPoolExecutor(max_workers=1)
 _status_future = None
 _status_cwd = None
 _active_context = (None, None)
-_active_pid = None
 _fish_cwds = {}
 _status = ""
 _timer = None
@@ -164,7 +163,7 @@ def _fish_cwd(window):
 
 
 def _refresh(timer_id):
-    global _status_future, _status_cwd, _active_context, _active_pid, _status
+    global _status_future, _status_cwd, _active_context, _status
 
     boss = get_boss()
     tab = boss.active_tab
@@ -172,8 +171,6 @@ def _refresh(timer_id):
     cwd = _fish_cwd(window) if window else None
     current = (tab.id if tab else None, cwd)
     previous = _active_context
-    old_pid = _active_pid
-    _active_pid = window.child.pid_for_cwd if window else None
     old_status = _status
     if current[0] != _active_context[0]:
         _status = ""
@@ -189,7 +186,7 @@ def _refresh(timer_id):
         _status_cwd = cwd
         _status_future = _executor.submit(_read_status, cwd)
 
-    if previous != current or old_pid != _active_pid or old_status != _status:
+    if previous != current or old_status != _status:
         for tab_id in {previous[0], current[0]} - {None}:
             changed_tab = boss.tab_for_id(tab_id)
             if changed_tab is not None:
@@ -216,28 +213,21 @@ def draw_tab(draw_data, screen, tab, before, max_title_length, index, is_last, e
     active_tab = boss.active_tab
     rendered_tab = boss.tab_for_id(tab.tab_id)
     if (
-        is_last and (_active_pid or _status) and active_tab and rendered_tab
+        is_last and _status and active_tab and rendered_tab
         and rendered_tab.os_window_id == active_tab.os_window_id
     ):
-        text = f" PID {_active_pid}" if _active_pid else ""
-        if _status:
-            text += f" {_status}"
-        text += " "
+        text = f" {_status} "
         width = wcswidth(text)
         if width < screen.columns - end:
             fg, bg = screen.cursor.fg, screen.cursor.bg
             screen.cursor.x = screen.columns - width
             screen.cursor.bg = as_rgb(color_as_int(draw_data.default_bg))
-            if _active_pid:
-                screen.cursor.fg = as_rgb(color_as_int(draw_data.default_fg))
-                screen.draw(f" PID {_active_pid}")
-            if _status:
-                branch, *symbols = _status.split(" ")
-                screen.cursor.fg = as_rgb(_BRANCH_COLOR)
-                screen.draw(f" {branch}")
-                for symbol in symbols:
-                    screen.cursor.fg = as_rgb(_STATUS_COLORS[symbol])
-                    screen.draw(f" {symbol}")
+            branch, *symbols = _status.split(" ")
+            screen.cursor.fg = as_rgb(_BRANCH_COLOR)
+            screen.draw(f" {branch}")
+            for symbol in symbols:
+                screen.cursor.fg = as_rgb(_STATUS_COLORS[symbol])
+                screen.draw(f" {symbol}")
             screen.draw(" ")
             screen.cursor.fg, screen.cursor.bg = fg, bg
     # Keep the status outside tab hitboxes so blank-space double-click still works.
