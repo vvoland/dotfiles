@@ -131,7 +131,7 @@ def _read_status(cwd):
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
-            timeout=2,
+            timeout=5,
             check=False,
         )
     except (OSError, subprocess.TimeoutExpired):
