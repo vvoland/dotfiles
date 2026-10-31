@@ -9,7 +9,7 @@ from copy import copy
 from random import shuffle
 
 from kitty.fast_data_types import add_timer, get_boss, wcswidth
-from kitty.tab_bar import as_rgb, draw_tab_with_powerline
+from kitty.tab_bar import as_rgb, draw_tab_with_powerline, powerline_symbols
 from kitty.utils import color_as_int
 
 
@@ -30,28 +30,29 @@ _TAB_BACKGROUNDS = (
     0x305F70,
 )
 _ACTIVE_FOREGROUND = 0xFFFFFF
-_INACTIVE_BACKGROUNDS = (0x303030, 0x242424)
+_INACTIVE_BACKGROUND = 0x303030
 _INACTIVE_FOREGROUND = 0xFFFFFF
 _tab_backgrounds = []
 
 
-def _colored_tab(tab, index):
-    if not tab.is_active:
-        # Distinct neighbors keep Powerline from falling back to a thin slash.
-        return tab._replace(
-            inactive_bg=_INACTIVE_BACKGROUNDS[(index - 1) % len(_INACTIVE_BACKGROUNDS)],
-            inactive_fg=_INACTIVE_FOREGROUND,
-        )
-
-    # Assign by position so closing or moving tabs cannot create equal neighbors.
+def _tab_background(index):
+    # Keep each position's accent stable across redraws.
     while len(_tab_backgrounds) < index:
         colors = list(_TAB_BACKGROUNDS)
         shuffle(colors)
         if _tab_backgrounds and colors[0] == _tab_backgrounds[-1]:
             colors[0], colors[1] = colors[1], colors[0]
         _tab_backgrounds.extend(colors)
+    return _tab_backgrounds[index - 1]
+
+
+def _colored_tab(tab, index):
+    if not tab.is_active:
+        return tab._replace(
+            inactive_bg=_INACTIVE_BACKGROUND, inactive_fg=_INACTIVE_FOREGROUND
+        )
     return tab._replace(
-        active_bg=_tab_backgrounds[index - 1], active_fg=_ACTIVE_FOREGROUND
+        active_bg=_tab_background(index), active_fg=_ACTIVE_FOREGROUND
     )
 
 
@@ -214,6 +215,19 @@ def draw_tab(draw_data, screen, tab, before, max_title_length, index, is_last, e
     boss = get_boss()
     active_tab = boss.active_tab
     rendered_tab = boss.tab_for_id(tab.tab_id)
+    if (
+        not tab.is_active and extra_data.next_tab is not None
+        and not extra_data.next_tab.is_active and rendered_tab is not None
+    ):
+        manager = rendered_tab.tab_manager_ref()
+        if manager is not None:
+            # Recolor only the soft separator, preserving title colors and hitboxes.
+            x, fg, bg = screen.cursor.x, screen.cursor.fg, screen.cursor.bg
+            screen.cursor.x = end - 1
+            screen.cursor.fg = as_rgb(_tab_background(manager.active_tab_idx + 1))
+            screen.cursor.bg = as_rgb(_INACTIVE_BACKGROUND)
+            screen.draw(powerline_symbols.get(draw_data.powerline_style, ('', ''))[1])
+            screen.cursor.x, screen.cursor.fg, screen.cursor.bg = x, fg, bg
     if (
         is_last and _status and active_tab and rendered_tab
         and rendered_tab.os_window_id == active_tab.os_window_id
