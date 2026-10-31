@@ -30,15 +30,17 @@ _TAB_BACKGROUNDS = (
     0x305F70,
 )
 _ACTIVE_FOREGROUND = 0xFFFFFF
-_INACTIVE_BACKGROUND = 0x303030
+_INACTIVE_BACKGROUNDS = (0x303030, 0x242424)
 _INACTIVE_FOREGROUND = 0xFFFFFF
 _tab_backgrounds = []
 
 
 def _colored_tab(tab, index):
     if not tab.is_active:
+        # Distinct neighbors keep Powerline from falling back to a thin slash.
         return tab._replace(
-            inactive_bg=_INACTIVE_BACKGROUND, inactive_fg=_INACTIVE_FOREGROUND
+            inactive_bg=_INACTIVE_BACKGROUNDS[(index - 1) % len(_INACTIVE_BACKGROUNDS)],
+            inactive_fg=_INACTIVE_FOREGROUND,
         )
 
     # Assign by position so closing or moving tabs cannot create equal neighbors.
