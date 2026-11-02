@@ -146,11 +146,12 @@ def _read_status(cwd):
 _executor = ThreadPoolExecutor(max_workers=1)
 _status_future = None
 _status_cwd = None
-_active_context = (None, None)
+_active_context = (None, None, None)
 _active_pid = None
 _fish_cwds = {}
 _status = ""
 _timer = None
+_status_timer = None
 
 
 def _fish_cwd(window):
@@ -166,19 +167,27 @@ def _fish_cwd(window):
     return _fish_cwds.get(window.id)
 
 
-def _refresh(timer_id):
+def _poll_status(timer_id):
+    global _status_timer
+
+    _status_timer = None
+    _refresh(None, refresh_status=False)
+
+
+def _refresh(timer_id, refresh_status=True):
     global _status_future, _status_cwd, _active_context, _active_pid, _status
+    global _status_timer
 
     boss = get_boss()
     tab = boss.active_tab
     window = tab.active_window if tab else None
     cwd = _fish_cwd(window) if window else None
-    current = (tab.id if tab else None, cwd)
+    current = (tab.id if tab else None, window.id if window else None, cwd)
     previous = _active_context
     old_pid = _active_pid
     _active_pid = window.child.pid_for_cwd if window else None
     old_status = _status
-    if current[0] != _active_context[0]:
+    if current != previous:
         _status = ""
     _active_context = current
 
@@ -188,9 +197,14 @@ def _refresh(timer_id):
         if _status_cwd == cwd and status is not None:
             _status = status
         _status_future = None
-    if cwd and _status_future is None:
+    if cwd and _status_future is None and (
+        refresh_status or previous != current or _status_cwd != cwd
+    ):
         _status_cwd = cwd
         _status_future = _executor.submit(_read_status, cwd)
+    if _status_future is not None and _status_timer is None:
+        # Check only pending Git work frequently, not the repository itself.
+        _status_timer = add_timer(_poll_status, 0.05, False)
 
     if previous != current or old_pid != _active_pid or old_status != _status:
         for tab_id in {previous[0], current[0]} - {None}:
@@ -204,7 +218,7 @@ def draw_tab(draw_data, screen, tab, before, max_title_length, index, is_last, e
 
     if _timer is None:
         _timer = add_timer(_refresh, 1.0, True)
-        _refresh(None)
+    _refresh(None, refresh_status=False)
     tab = _colored_tab(tab, index)
     # Powerline uses the next tab's background for the separator color.
     extra_data = copy(extra_data)
