@@ -263,7 +263,7 @@
       "KC_NO",
       "KC_END",
       "KC_NO",
-      "LT(5,KC_ESC)",
+      "MO(5)",
       "KC_A",
       "KC_S",
       "KC_D",
